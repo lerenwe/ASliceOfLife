@@ -8,8 +8,10 @@ public class CameraBehaviour : MonoBehaviour {
     #endregion
 
     #region Components & Objects Variable
-    public SpriteRenderer currentBackGround;
     public GameObject player;
+
+    [SerializeField]
+    SpriteRenderer currentBackGround;
     Camera camera;
     Rect CameraRect;
     #endregion
@@ -26,6 +28,9 @@ public class CameraBehaviour : MonoBehaviour {
     // Update is called once per frame
     void Update ()
     {
+        //Get the current BackGround where the player is
+        currentBackGround = GameStateManager.currentActiveScene.GetComponent<SubSceneManager>().myBackGround.GetComponent<SpriteRenderer>();
+
         targetPosition = new Vector3(player.transform.position.x, currentBackGround.transform.position.y, -10f);
 
         PreventGettingOutOfBackground();
@@ -44,7 +49,10 @@ public class CameraBehaviour : MonoBehaviour {
 
         //Debug.DrawLine(camera.transform.position, new Vector3(camera.transform.position.x + cameraHorizontalExtent, 0, 0));
 
-        if ( (targetPosition.x - cameraHorizontalExtent < currentBackGroundLeftBorder.x) || (targetPosition.x + cameraHorizontalExtent > currentBackGroundRightBorder.x) )
-            targetPosition.x = transform.position.x;
+        if (targetPosition.x - cameraHorizontalExtent < currentBackGroundLeftBorder.x)
+            targetPosition.x = currentBackGroundLeftBorder.x + cameraHorizontalExtent;
+        else if (targetPosition.x + cameraHorizontalExtent > currentBackGroundRightBorder.x)
+            targetPosition.x = currentBackGroundRightBorder.x - cameraHorizontalExtent;
+
     }
 }
