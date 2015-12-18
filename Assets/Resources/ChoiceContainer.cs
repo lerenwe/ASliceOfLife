@@ -4,12 +4,12 @@ using System.Collections.Generic;
 using System.Xml.Serialization;
 using System.IO;
 
-[XmlRoot("ChoicesCollection")]
+[XmlRoot("ChoicesCollection"), System.Serializable]
 public class ChoicesContainer {
 
     [XmlArray("Choices")]
     [XmlArrayItem("Choice")]
-    public List<Item> choices = new List<Item>();
+    public List<Choice> choices = new List<Choice>();
 
     public void Save (string path)
     {

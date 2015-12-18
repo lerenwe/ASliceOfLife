@@ -4,7 +4,7 @@ using System.Xml;
 using System.Xml.Serialization;
 
 [System.Serializable]
-public class Item {
+public class Choice {
 
     [XmlAttribute("name")]
     public string name;
@@ -13,6 +13,6 @@ public class Item {
     public bool ChoiceMade;
 
     [XmlElement("First")]
-    public bool durability;
+    public bool madeFirstChoice;
 
 }
