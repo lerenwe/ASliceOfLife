@@ -10,13 +10,6 @@ public class GameStateManager : MonoBehaviour {
     public static GameObject player;
     public static Collider2D playerCollider;
 
-    public Dictionary<string, bool> NamedBooleans = new Dictionary<string, bool>();
-    //NamedBooleans.Add("This is the name of the first boolean", false);
-    //NamedBooleans.Add("This is the name of the second boolean", true);
-
-    public enum choicesOutcomes { Lol, lol };
-    public choicesOutcomes[] outComes;
-
 	// Use this for initialization
 	void Start ()
     {
@@ -51,7 +44,7 @@ public class GameStateManager : MonoBehaviour {
             Debug.DrawLine(localizedBackGroundBounds.min, localizedBackGroundBounds.max, Color.red, 3f);
         }
 
-        Debug.Log("Current Active Scene = " + currentActiveScene);
+        //Debug.Log("Current Active Scene = " + currentActiveScene);
         #endregion
 
     }

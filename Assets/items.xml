@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<ChoicesCollection xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Choices>
+    <Choice name="Sporty or Nerdy">
+      <ChoiceMade>true</ChoiceMade>
+      <First>false</First>
+    </Choice>
+    <Choice name="Defend or Ignore">
+      <ChoiceMade>false</ChoiceMade>
+      <First>false</First>
+    </Choice>
+    <Choice name="Speak out or Stay Mute">
+      <ChoiceMade>false</ChoiceMade>
+      <First>false</First>
+    </Choice>
+  </Choices>
+</ChoicesCollection>
