@@ -11,6 +11,7 @@ public class subSceneExit : MonoBehaviour {
     [SerializeField]
     bool touchToExit;
     bool playerIsTouchingExit = false;
+    bool preRequisitesMatch = false;
 
     ChoiceLoader choiceLoader;
 
@@ -49,11 +50,28 @@ public class subSceneExit : MonoBehaviour {
         {
             Debug.Log("Trying to exit...");
 
-            if (preRequisiteChoices.SequenceEqual(choiceLoader.everyChoices.choices))
-            { 
-                GameStateManager.player.transform.position = destinationPoint.transform.position;
-                Debug.Log("Exit right now");
+            int countChoiceCheck = 0;
+
+            foreach (Choice choice in preRequisiteChoices)
+            {
+                if (choice.ChoiceMade == true && choiceLoader.everyChoices.choices[countChoiceCheck].ChoiceMade == choice.ChoiceMade)
+                {
+                    Debug.Log(choice.name + "'s bool match");
+                    preRequisitesMatch = true;
+                }
+                else
+                {
+                    preRequisitesMatch = false;
+                    break;
+                }
+
+                countChoiceCheck++;
+
+                if (preRequisitesMatch)
+                    GameStateManager.player.transform.position = destinationPoint.transform.position;
             }
+
+            countChoiceCheck = 0;
         }
 
         if (playerIsTouchingExit)
