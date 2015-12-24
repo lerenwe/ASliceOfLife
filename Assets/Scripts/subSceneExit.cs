@@ -18,6 +18,15 @@ public class subSceneExit : MonoBehaviour {
     [SerializeField]
     List<Choice> preRequisiteChoices = new List<Choice>();
 
+    [SerializeField]
+    List<Choice> makeChoice = new List<Choice>();
+
+    [Header("Change an exit's target when triggered")]
+    [SerializeField]
+    GameObject[] ExitToModify;
+    [SerializeField]
+    GameObject NewTargetPoint;
+
     // Use this for initialization
     void Start () {
         choiceLoader = GameObject.Find("GameStateManager").GetComponent<ChoiceLoader>();
@@ -26,6 +35,7 @@ public class subSceneExit : MonoBehaviour {
         Debug.Log(preRequisiteChoices.GetHashCode());
         Debug.Log(choiceLoader.everyChoices.choices.GetHashCode());
 
+        #region Setting up local lists
         if (preRequisiteChoices.Count < choiceLoader.everyChoices.choices.Count)
         {
             foreach (Choice choice in choiceLoader.everyChoices.choices)
@@ -33,7 +43,16 @@ public class subSceneExit : MonoBehaviour {
                 preRequisiteChoices.Add(choice);
             }
         }
-	}
+
+        if (makeChoice.Count < choiceLoader.everyChoices.choices.Count)
+        {
+            foreach (Choice choice in choiceLoader.everyChoices.choices)
+            {
+                makeChoice.Add(choice);
+            }
+        }
+        #endregion
+    }
 
     void Awake ()
     {
@@ -68,7 +87,7 @@ public class subSceneExit : MonoBehaviour {
                 countChoiceCheck++;
 
                 if (preRequisitesMatch)
-                    GameStateManager.player.transform.position = destinationPoint.transform.position;
+                    Exit();
             }
 
             countChoiceCheck = 0;
@@ -83,7 +102,7 @@ public class subSceneExit : MonoBehaviour {
         if (touchToExit)
         {
             if (hit == GameStateManager.playerCollider)
-                GameStateManager.player.transform.position = destinationPoint.transform.position;
+                Exit();
         }
     }
 
@@ -103,5 +122,34 @@ public class subSceneExit : MonoBehaviour {
             if (hit == GameStateManager.playerCollider)
                 playerIsTouchingExit = false;
         }
+    }
+
+    void Exit ()
+    {
+        //Update choice list
+        int countChoiceCheck = 0;
+
+        foreach (Choice choice in makeChoice)
+        {
+            if (choice.ChoiceMade == true && choice.ChoiceMade != choiceLoader.everyChoices.choices[countChoiceCheck].ChoiceMade)
+                choiceLoader.everyChoices.choices[countChoiceCheck].ChoiceMade = choice.ChoiceMade;
+
+            if (choice.madeFirstChoice == true && choice.madeFirstChoice != choiceLoader.everyChoices.choices[countChoiceCheck].madeFirstChoice)
+                choiceLoader.everyChoices.choices[countChoiceCheck].madeFirstChoice = choice.madeFirstChoice;
+
+            countChoiceCheck++;
+        }
+
+        countChoiceCheck = 0;
+
+        #region If necessary, change an exit's target point
+        foreach (GameObject exit in ExitToModify)
+        {
+            if (exit != null && NewTargetPoint != null)
+                exit.GetComponent<subSceneExit>().destinationPoint = NewTargetPoint;
+        }
+        #endregion
+
+        GameStateManager.player.transform.position = destinationPoint.transform.position;
     }
 }

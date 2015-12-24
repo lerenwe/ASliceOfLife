@@ -6,7 +6,7 @@
       <First>false</First>
     </Choice>
     <Choice name="Defend or Ignore">
-      <ChoiceMade>false</ChoiceMade>
+      <ChoiceMade>true</ChoiceMade>
       <First>false</First>
     </Choice>
     <Choice name="Speak out or Stay Mute">

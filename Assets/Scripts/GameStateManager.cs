@@ -10,8 +10,10 @@ public class GameStateManager : MonoBehaviour {
     public static GameObject player;
     public static Collider2D playerCollider;
 
-	// Use this for initialization
-	void Start ()
+    
+
+    // Use this for initialization
+    void Start ()
     {
         player = GameObject.Find("Player");
         playerCollider = player.GetComponent<BoxCollider2D>();
@@ -46,6 +48,11 @@ public class GameStateManager : MonoBehaviour {
 
         //Debug.Log("Current Active Scene = " + currentActiveScene);
         #endregion
+
+    }
+
+    void UpdateExits ()
+    {
 
     }
 }
