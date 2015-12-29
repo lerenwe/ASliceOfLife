@@ -14,8 +14,8 @@ public class ChoiceLoader : MonoBehaviour {
         //everyChoices.Save(Path.Combine(Application.dataPath, "items.xml"));
         foreach (Choice choice in everyChoices.choices)
         { 
-            Debug.Log(choice.name);
-            Debug.Log(choice.ChoiceMade);
+            //Debug.Log(choice.name);
+            //Debug.Log(choice.ChoiceMade);
         }
     }
 

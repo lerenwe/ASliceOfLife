@@ -9,8 +9,9 @@ public class subSceneExit : MonoBehaviour {
     public GameObject destinationPoint;
 
     [SerializeField]
-    bool touchToExit;
-    bool playerIsTouchingExit = false;
+    public bool touchToExit;
+    [HideInInspector]
+    public bool playerIsTouchingExit = false;
     bool preRequisitesMatch = false;
 
     ChoiceLoader choiceLoader;
@@ -27,13 +28,19 @@ public class subSceneExit : MonoBehaviour {
     [SerializeField]
     GameObject NewTargetPoint;
 
+    [Header("Change a subScene background when trigered")]
+    [SerializeField]
+    BackGroundChangeReceptor targetBackGroundChangeScript;
+    [SerializeField]
+    int backGroundNumberToUse;
+
     // Use this for initialization
     void Start () {
         choiceLoader = GameObject.Find("GameStateManager").GetComponent<ChoiceLoader>();
         //preRequisiteChoices = choiceLoader.everyChoices.choices;
 
-        Debug.Log(preRequisiteChoices.GetHashCode());
-        Debug.Log(choiceLoader.everyChoices.choices.GetHashCode());
+        //Debug.Log(preRequisiteChoices.GetHashCode());
+        //Debug.Log(choiceLoader.everyChoices.choices.GetHashCode());
 
         #region Setting up local lists
         if (preRequisiteChoices.Count < choiceLoader.everyChoices.choices.Count)
@@ -73,9 +80,8 @@ public class subSceneExit : MonoBehaviour {
 
             foreach (Choice choice in preRequisiteChoices)
             {
-                if (choice.ChoiceMade == true && choiceLoader.everyChoices.choices[countChoiceCheck].ChoiceMade == choice.ChoiceMade)
+                if ( (choice.ChoiceMade == true && choiceLoader.everyChoices.choices[countChoiceCheck].ChoiceMade == choice.ChoiceMade) || choice.ChoiceMade == false)
                 {
-                    Debug.Log(choice.name + "'s bool match");
                     preRequisitesMatch = true;
                 }
                 else
@@ -83,21 +89,22 @@ public class subSceneExit : MonoBehaviour {
                     preRequisitesMatch = false;
                     break;
                 }
-
                 countChoiceCheck++;
-
-                if (preRequisitesMatch)
-                    Exit();
             }
+
+            if (preRequisitesMatch)
+            {
+                Debug.Log(gameObject.name + "'s prerequisites are matching.");
+                Exit();
+            }
+            else
+                Debug.Log(gameObject.name + "'s prerequisites are NOT matching.");
 
             countChoiceCheck = 0;
         }
-
-        if (playerIsTouchingExit)
-            Debug.Log("Player is colliding with " + gameObject.name);
 	}
 
-    void OnTriggerEnter2D (Collider2D hit)
+    public virtual void OnTriggerEnter2D (Collider2D hit)
     {
         if (touchToExit)
         {
@@ -124,7 +131,7 @@ public class subSceneExit : MonoBehaviour {
         }
     }
 
-    void Exit ()
+    public virtual void Exit ()
     {
         //Update choice list
         int countChoiceCheck = 0;
@@ -148,6 +155,11 @@ public class subSceneExit : MonoBehaviour {
             if (exit != null && NewTargetPoint != null)
                 exit.GetComponent<subSceneExit>().destinationPoint = NewTargetPoint;
         }
+        #endregion
+
+        #region If necessary, change a background
+        if (targetBackGroundChangeScript != null && backGroundNumberToUse != null)
+            targetBackGroundChangeScript.changeBackground(backGroundNumberToUse);
         #endregion
 
         GameStateManager.player.transform.position = destinationPoint.transform.position;
