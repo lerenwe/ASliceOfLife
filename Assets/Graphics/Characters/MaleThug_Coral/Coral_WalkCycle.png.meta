@@ -1,9 +1,17 @@
 fileFormatVersion: 2
 guid: 3f688a413f70db743a5bc07391d00128
-timeCreated: 1450204338
+timeCreated: 1451510726
 licenseType: Free
 TextureImporter:
-  fileIDToRecycleName: {}
+  fileIDToRecycleName:
+    21300000: Coral_WalkCycle_0
+    21300002: Coral_WalkCycle_1
+    21300004: Coral_WalkCycle_2
+    21300006: Coral_WalkCycle_3
+    21300008: Coral_WalkCycle_4
+    21300010: Coral_WalkCycle_5
+    21300012: Coral_WalkCycle_6
+    21300014: Coral_WalkCycle_7
   serializedVersion: 2
   mipmaps:
     mipMapMode: 0
@@ -30,7 +38,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     filterMode: -1
-    aniso: -1
+    aniso: 16
     mipBias: -1
     wrapMode: 1
   nPOTScale: 0
@@ -38,18 +46,365 @@ TextureImporter:
   rGBM: 0
   compressionQuality: 50
   allowsAlphaSplitting: 0
-  spriteMode: 1
+  spriteMode: 2
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
-  spritePixelsToUnits: 100
+  spritePixelsToUnits: 170
   alphaIsTransparency: 1
   textureType: 8
   buildTargetSettings: []
   spriteSheet:
-    sprites: []
+    sprites:
+    - name: Coral_WalkCycle_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 384
+        height: 900
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 106, y: -239}
+        - {x: 86, y: -42}
+        - {x: 48, y: 292}
+        - {x: 22, y: 292}
+        - {x: -39, y: 275}
+        - {x: -61, y: 256}
+        - {x: -99, y: 75}
+        - {x: -100, y: 46}
+        - {x: -100, y: -60}
+        - {x: -89, y: -70}
+        - {x: -62, y: -59}
+        - {x: -58, y: -38}
+        - {x: -98, y: -237}
+        - {x: -73, y: -255}
+        - {x: -63, y: -260}
+        - {x: -37, y: -256}
+        - {x: -38, y: -244}
+        - {x: 51, y: -272}
+        - {x: 65, y: -272}
+        - {x: 119, y: -256}
+        - {x: 121, y: -252}
+        - {x: 121, y: -247}
+        - {x: 117, y: -239}
+      - - {x: 29, y: 65}
+        - {x: 28, y: 59}
+        - {x: 28, y: 55}
+        - {x: 30, y: 54}
+        - {x: 33, y: 55}
+        - {x: 35, y: 63}
+        - {x: 32, y: 66}
+        - {x: 31, y: 66}
+      - - {x: 32, y: 76}
+        - {x: 32, y: 75}
+        - {x: 35, y: 72}
+        - {x: 38, y: 73}
+        - {x: 38, y: 76}
+        - {x: 36, y: 78}
+        - {x: 34, y: 78}
+      - - {x: 35, y: 87}
+        - {x: 34, y: 85}
+        - {x: 34, y: 80}
+        - {x: 36, y: 79}
+        - {x: 38, y: 79}
+        - {x: 40, y: 82}
+        - {x: 40, y: 86}
+        - {x: 38, y: 88}
+    - name: Coral_WalkCycle_1
+      rect:
+        serializedVersion: 2
+        x: 384
+        y: 0
+        width: 384
+        height: 900
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 41, y: 296}
+        - {x: 23, y: 296}
+        - {x: -43, y: 276}
+        - {x: -55, y: 259}
+        - {x: -73, y: 150}
+        - {x: -69, y: 62}
+        - {x: -50, y: -109}
+        - {x: -118, y: -208}
+        - {x: -118, y: -218}
+        - {x: -76, y: -251}
+        - {x: -63, y: -241}
+        - {x: -14, y: -272}
+        - {x: 59, y: -272}
+        - {x: 59, y: -254}
+        - {x: 43, y: -231}
+        - {x: 55, y: -23}
+        - {x: 48, y: 212}
+      - - {x: 33, y: 69}
+        - {x: 31, y: 67}
+        - {x: 30, y: 62}
+        - {x: 32, y: 60}
+        - {x: 34, y: 60}
+        - {x: 36, y: 62}
+        - {x: 37, y: 67}
+        - {x: 35, y: 69}
+      - - {x: 38, y: 91}
+        - {x: 34, y: 88}
+        - {x: 34, y: 77}
+        - {x: 36, y: 76}
+        - {x: 39, y: 76}
+        - {x: 42, y: 81}
+        - {x: 42, y: 89}
+        - {x: 41, y: 91}
+    - name: Coral_WalkCycle_2
+      rect:
+        serializedVersion: 2
+        x: 768
+        y: 0
+        width: 384
+        height: 900
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 52, y: 92}
+        - {x: 48, y: 141}
+        - {x: 52, y: 180}
+        - {x: 52, y: 227}
+        - {x: 33, y: 298}
+        - {x: -6, y: 298}
+        - {x: -50, y: 279}
+        - {x: -67, y: 263}
+        - {x: -70, y: 127}
+        - {x: -59, y: 62}
+        - {x: -48, y: -142}
+        - {x: -75, y: -200}
+        - {x: -75, y: -209}
+        - {x: -40, y: -272}
+        - {x: 45, y: -272}
+        - {x: 14, y: -169}
+        - {x: 48, y: -105}
+        - {x: 52, y: -101}
+      - - {x: 26, y: 71}
+        - {x: 24, y: 69}
+        - {x: 24, y: 62}
+        - {x: 26, y: 60}
+        - {x: 30, y: 61}
+        - {x: 30, y: 70}
+        - {x: 28, y: 71}
+      - - {x: 29, y: 93}
+        - {x: 28, y: 86}
+        - {x: 28, y: 79}
+        - {x: 30, y: 78}
+        - {x: 35, y: 78}
+        - {x: 35, y: 94}
+        - {x: 33, y: 94}
+    - name: Coral_WalkCycle_3
+      rect:
+        serializedVersion: 2
+        x: 1152
+        y: 0
+        width: 384
+        height: 900
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -24, y: -229}
+        - {x: 36, y: -255}
+        - {x: 47, y: -248}
+        - {x: 43, y: -232}
+        - {x: 72, y: -67}
+        - {x: 72, y: 67}
+        - {x: 31, y: 300}
+        - {x: -1, y: 300}
+        - {x: -56, y: 281}
+        - {x: -70, y: 264}
+        - {x: -57, y: 218}
+        - {x: -84, y: 143}
+        - {x: -84, y: -102}
+        - {x: -71, y: -272}
+        - {x: 9, y: -272}
+        - {x: 3, y: -254}
+        - {x: -30, y: -245}
+        - {x: -5, y: -128}
+    - name: Coral_WalkCycle_4
+      rect:
+        serializedVersion: 2
+        x: 1536
+        y: 0
+        width: 384
+        height: 900
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 33, y: 291}
+        - {x: -28, y: 274}
+        - {x: -45, y: 257}
+        - {x: -35, y: 208}
+        - {x: -75, y: 87}
+        - {x: -79, y: 74}
+        - {x: -94, y: -16}
+        - {x: -82, y: -37}
+        - {x: -62, y: -32}
+        - {x: -50, y: -19}
+        - {x: -45, y: -4}
+        - {x: -100, y: -233}
+        - {x: -100, y: -251}
+        - {x: -98, y: -257}
+        - {x: -70, y: -273}
+        - {x: 126, y: -273}
+        - {x: 126, y: 212}
+        - {x: 72, y: 291}
+      - - {x: 37, y: 64}
+        - {x: 34, y: 63}
+        - {x: 34, y: 54}
+        - {x: 36, y: 53}
+        - {x: 39, y: 54}
+        - {x: 41, y: 57}
+        - {x: 41, y: 63}
+        - {x: 40, y: 64}
+      - - {x: 40, y: 83}
+        - {x: 39, y: 77}
+        - {x: 39, y: 73}
+        - {x: 41, y: 71}
+        - {x: 44, y: 72}
+        - {x: 46, y: 80}
+        - {x: 46, y: 85}
+        - {x: 43, y: 86}
+    - name: Coral_WalkCycle_5
+      rect:
+        serializedVersion: 2
+        x: 1920
+        y: 0
+        width: 384
+        height: 900
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 56, y: -256}
+        - {x: 56, y: -249}
+        - {x: 52, y: -241}
+        - {x: 56, y: -183}
+        - {x: 56, y: 84}
+        - {x: 43, y: 296}
+        - {x: -12, y: 296}
+        - {x: -51, y: 289}
+        - {x: -92, y: 141}
+        - {x: -49, y: -104}
+        - {x: -81, y: -150}
+        - {x: -126, y: -224}
+        - {x: -126, y: -237}
+        - {x: -99, y: -265}
+        - {x: -61, y: -265}
+        - {x: -42, y: -208}
+        - {x: -8, y: -261}
+        - {x: 54, y: -258}
+      - - {x: 27, y: 21}
+        - {x: 26, y: 16}
+        - {x: 28, y: 14}
+        - {x: 30, y: 14}
+        - {x: 32, y: 16}
+        - {x: 32, y: 20}
+        - {x: 30, y: 22}
+      - - {x: 33, y: 69}
+        - {x: 31, y: 67}
+        - {x: 30, y: 62}
+        - {x: 32, y: 60}
+        - {x: 34, y: 60}
+        - {x: 36, y: 62}
+        - {x: 37, y: 67}
+        - {x: 35, y: 69}
+      - - {x: 38, y: 91}
+        - {x: 34, y: 88}
+        - {x: 34, y: 77}
+        - {x: 36, y: 76}
+        - {x: 39, y: 76}
+        - {x: 42, y: 81}
+        - {x: 42, y: 89}
+        - {x: 41, y: 91}
+    - name: Coral_WalkCycle_6
+      rect:
+        serializedVersion: 2
+        x: 2304
+        y: 0
+        width: 384
+        height: 900
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 50, y: -116}
+        - {x: 50, y: -8}
+        - {x: 49, y: 14}
+        - {x: 50, y: 52}
+        - {x: 50, y: 234}
+        - {x: 33, y: 298}
+        - {x: -6, y: 298}
+        - {x: -50, y: 279}
+        - {x: -62, y: 262}
+        - {x: -81, y: 150}
+        - {x: -81, y: 110}
+        - {x: -54, y: -29}
+        - {x: -81, y: -195}
+        - {x: -81, y: -228}
+        - {x: -41, y: -258}
+        - {x: 32, y: -258}
+        - {x: 36, y: -246}
+        - {x: 3, y: -174}
+      - - {x: 26, y: 71}
+        - {x: 24, y: 69}
+        - {x: 24, y: 62}
+        - {x: 26, y: 60}
+        - {x: 30, y: 61}
+        - {x: 30, y: 70}
+        - {x: 28, y: 71}
+      - - {x: 29, y: 93}
+        - {x: 28, y: 86}
+        - {x: 28, y: 79}
+        - {x: 30, y: 78}
+        - {x: 35, y: 78}
+        - {x: 35, y: 94}
+        - {x: 33, y: 94}
+    - name: Coral_WalkCycle_7
+      rect:
+        serializedVersion: 2
+        x: 2688
+        y: 0
+        width: 384
+        height: 900
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 68, y: 21}
+        - {x: 35, y: 71}
+        - {x: 42, y: 125}
+        - {x: 35, y: 182}
+        - {x: 37, y: 297}
+        - {x: 31, y: 300}
+        - {x: 16, y: 300}
+        - {x: -56, y: 281}
+        - {x: -75, y: 266}
+        - {x: -73, y: 159}
+        - {x: -98, y: 92}
+        - {x: -98, y: 54}
+        - {x: -66, y: -28}
+        - {x: -39, y: -48}
+        - {x: -52, y: -139}
+        - {x: -56, y: -210}
+        - {x: -57, y: -231}
+        - {x: -58, y: -263}
+        - {x: 3, y: -267}
+        - {x: 52, y: -267}
+        - {x: 49, y: -253}
+        - {x: 48, y: -162}
+        - {x: 68, y: -123}
     outline: []
   spritePackingTag: 
   userData: 

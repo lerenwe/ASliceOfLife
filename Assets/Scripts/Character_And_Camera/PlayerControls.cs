@@ -6,9 +6,10 @@ public class PlayerControls : MonoBehaviour {
     #region Controls Variables
     public float speedMultiplier = 5f;
 
-    Vector3 moveDirection;
-
-    bool canControl = true;
+    [HideInInspector]
+    public Vector3 moveDirection;
+    [HideInInspector]
+    public bool canControl = true;
     #endregion
 
     #region My Components Variables
@@ -34,6 +35,8 @@ public class PlayerControls : MonoBehaviour {
         {
             Move();
         }
+        else
+            moveDirection = Vector3.zero;
 
         ManageSprite();
         ManageAnimator();
