@@ -18,6 +18,7 @@ public class NPC : MonoBehaviour {
     GameObject player;
     [SerializeField]
     float towardPlayerOffset;
+    public GameObject objectToLookAt;
     #endregion
 
     #region My Components Variables
@@ -54,7 +55,6 @@ public class NPC : MonoBehaviour {
         {
             distToTarget = transform.position.x - targetPoint.transform.position.x;
             distToTarget = Mathf.Abs(distToTarget);
-            Debug.Log("distToTarget = " + distToTarget);
 
             if (distToTarget > .1f)
             {
@@ -72,7 +72,6 @@ public class NPC : MonoBehaviour {
         {
             distToTarget = transform.position.x - player.transform.position.x;
             distToTarget = Mathf.Abs(distToTarget);
-            Debug.Log("distToTarget = " + distToTarget);
 
             if (distToTarget > towardPlayerOffset)
             {

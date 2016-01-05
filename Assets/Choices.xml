@@ -3,7 +3,7 @@
   <Choices>
     <Choice name="Sporty or Nerdy">
       <ChoiceMade>true</ChoiceMade>
-      <First>false</First>
+      <First>true</First>
     </Choice>
     <Choice name="Defend or Ignore">
       <ChoiceMade>false</ChoiceMade>
