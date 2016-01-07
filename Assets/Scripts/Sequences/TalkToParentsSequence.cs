@@ -11,6 +11,8 @@ public class TalkToParentsSequence : MonoBehaviour {
     GameObject[] ExitZones;
     [SerializeField]
     GameObject newDestinationPoint;
+    [SerializeField]
+    GameObject mom_Exit;
 
     [HideInInspector]
     public bool triggeredSequence = false;
@@ -30,6 +32,8 @@ public class TalkToParentsSequence : MonoBehaviour {
         {
             Debug.Log("Launch Parent Sequence");
             triggeredSequence = true;
+            mom_Exit.GetComponent<BoxCollider2D>().enabled = true;
+            Debug.Log("Knock knock!");
         }
 
         if (sequenceEnded)

@@ -43,13 +43,15 @@ public class SchoolSequence : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (ChoiceScript.everyChoices.choices.First(item => item.name == "Sporty or Nerdy").ChoiceMade == true && !isTriggered)
+        if (ChoiceScript.everyChoices.choices.First(item => item.name == "Sporty or Nerdy").ChoiceMade == true && !isTriggered
+            && CameraBehaviour.currentBackGround == this.GetComponent<SubSceneManager>().myBackGround)
         {
             if (ChoiceScript.everyChoices.choices.First(item => item.name == "Sporty or Nerdy").madeFirstChoice == true)
             {
                 SetWalkWithThugs();
             }
-            else
+            else if (ChoiceScript.everyChoices.choices.First(item => item.name == "Sporty or Nerdy").ChoiceMade == true
+                    && ChoiceScript.everyChoices.choices.First(item => item.name == "Sporty or Nerdy").madeFirstChoice == false)
             {
                 PlaceThugs();
             }
@@ -61,12 +63,14 @@ public class SchoolSequence : MonoBehaviour
 
     void SetWalkWithThugs ()
     {
+        Debug.Log("You'll walk among the thugs.");
         Thug1Script.moveTowardPlayer = true;
         Thug2Script.moveTowardPlayer = true;
     }
 
     void PlaceThugs()
     {
+        Debug.Log("THUGS ARE WAITING FOR YOU");
         Thug1.transform.position = targetPoint1.transform.position;
         Thug2.transform.position = targetPoint2.transform.position;
 

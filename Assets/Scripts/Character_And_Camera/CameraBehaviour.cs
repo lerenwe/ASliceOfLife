@@ -11,7 +11,7 @@ public class CameraBehaviour : MonoBehaviour {
     public GameObject player;
 
     [SerializeField]
-    SpriteRenderer currentBackGround;
+    public static SpriteRenderer currentBackGround;
     Camera camera;
     Rect CameraRect;
     #endregion

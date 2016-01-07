@@ -72,7 +72,7 @@ public class subSceneExit : MonoBehaviour {
     // Update is called once per frame
     void Update ()
     {
-	    if (!touchToExit && playerIsTouchingExit && Input.GetAxisRaw("Vertical") > .5f)
+	    if (!touchToExit && playerIsTouchingExit && Input.GetAxisRaw("Vertical") > .5f && GameStateManager.player.GetComponent<PlayerControls>().canControl)
         {
             Debug.Log("Trying to exit...");
 

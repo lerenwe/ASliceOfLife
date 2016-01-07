@@ -6,6 +6,7 @@ public class ParentSequenceExit : subSceneExit
 
     [SerializeField]
     GameObject BedRoomManager;
+
     TalkToParentsSequence parentSequenceScript;
 
 
