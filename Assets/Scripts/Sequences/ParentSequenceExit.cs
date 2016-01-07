@@ -10,9 +10,9 @@ public class ParentSequenceExit : subSceneExit
     TalkToParentsSequence parentSequenceScript;
 
 
-    public override void Exit()
+    public override IEnumerator Exit()
     {
-            base.Exit();
+            return base.Exit();
             parentSequenceScript = BedRoomManager.GetComponent<TalkToParentsSequence>();
 
             if (parentSequenceScript.triggeredSequence)

@@ -31,7 +31,7 @@ public class CameraBehaviour : MonoBehaviour {
         //Get the current BackGround where the player is
         currentBackGround = GameStateManager.currentActiveScene.GetComponent<SubSceneManager>().myBackGround.GetComponent<SpriteRenderer>();
 
-        targetPosition = new Vector3(player.transform.position.x, currentBackGround.transform.position.y, -10f);
+        targetPosition = new Vector3(player.transform.position.x, player.transform.position.y, -10f);
 
         PreventGettingOutOfBackground();
 
@@ -40,19 +40,31 @@ public class CameraBehaviour : MonoBehaviour {
 
     void PreventGettingOutOfBackground ()
     {
-        Vector3 currentBackGroundLeftBorder = currentBackGround.transform.position - currentBackGround.sprite.bounds.extents;
+        Vector3 currentBackGroundBottomLeftBorder = currentBackGround.transform.position - currentBackGround.sprite.bounds.extents;
 
         Vector3 cameraRightBorder = camera.ScreenToWorldPoint(new Vector3(CameraRect.width, CameraRect.height / 2, 0));
-        Vector3 currentBackGroundRightBorder = currentBackGround.transform.position + currentBackGround.sprite.bounds.extents;
+        Vector3 cameraTopBorder = camera.ScreenToWorldPoint(new Vector3(CameraRect.width / 2, CameraRect.height, 0));
+
+        Debug.DrawLine(cameraRightBorder, cameraTopBorder, Color.blue);
+
+        Vector3 currentBackGroundTopRightBorder = currentBackGround.transform.position + currentBackGround.sprite.bounds.extents;
 
         float cameraHorizontalExtent = cameraRightBorder.x - transform.position.x;
 
-        //Debug.DrawLine(camera.transform.position, new Vector3(camera.transform.position.x + cameraHorizontalExtent, 0, 0));
+        
 
-        if (targetPosition.x - cameraHorizontalExtent < currentBackGroundLeftBorder.x)
-            targetPosition.x = currentBackGroundLeftBorder.x + cameraHorizontalExtent;
-        else if (targetPosition.x + cameraHorizontalExtent > currentBackGroundRightBorder.x)
-            targetPosition.x = currentBackGroundRightBorder.x - cameraHorizontalExtent;
+        float cameraVerticalExtent = cameraTopBorder.y - transform.position.y;
+
+
+        if (targetPosition.x - cameraHorizontalExtent < currentBackGroundBottomLeftBorder.x)
+            targetPosition.x = currentBackGroundBottomLeftBorder.x + cameraHorizontalExtent;
+        else if (targetPosition.x + cameraHorizontalExtent > currentBackGroundTopRightBorder.x)
+            targetPosition.x = currentBackGroundTopRightBorder.x - cameraHorizontalExtent;
+
+        if (targetPosition.y + cameraVerticalExtent > currentBackGroundTopRightBorder.y)
+            targetPosition.y = currentBackGroundTopRightBorder.y - cameraVerticalExtent;
+        else if (targetPosition.y - cameraVerticalExtent < currentBackGroundBottomLeftBorder.y)
+            targetPosition.y = currentBackGroundBottomLeftBorder.y + cameraVerticalExtent;
 
     }
 }

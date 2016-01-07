@@ -95,7 +95,7 @@ public class subSceneExit : MonoBehaviour {
             if (preRequisitesMatch)
             {
                 Debug.Log(gameObject.name + "'s prerequisites are matching.");
-                Exit();
+                StartCoroutine (Exit());
             }
             else
                 Debug.Log(gameObject.name + "'s prerequisites are NOT matching.");
@@ -108,8 +108,9 @@ public class subSceneExit : MonoBehaviour {
     {
         if (touchToExit)
         {
+            Debug.Log("BAH ALORS ?!");
             if (hit == GameStateManager.playerCollider)
-                Exit();
+                StartCoroutine (Exit());
         }
     }
 
@@ -131,8 +132,10 @@ public class subSceneExit : MonoBehaviour {
         }
     }
 
-    public virtual void Exit ()
+    public virtual IEnumerator Exit ()
     {
+        yield return StartCoroutine(GameStateManager.FadeOut());
+
         //Update choice list
         int countChoiceCheck = 0;
 
@@ -163,5 +166,7 @@ public class subSceneExit : MonoBehaviour {
         #endregion
 
         GameStateManager.player.transform.position = destinationPoint.transform.position;
+
+        StartCoroutine (GameStateManager.FadeIn());
     }
 }
