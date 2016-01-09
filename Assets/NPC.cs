@@ -100,6 +100,6 @@ public class NPC : MonoBehaviour {
 
     void ManageAnimator()
     {
-        //animator.SetFloat("outSpeed", Mathf.Abs(moveDirection.x));
+        animator.SetFloat("Speed", Mathf.Abs(moveDirection.x * speedMultiplier));
     }
 }
