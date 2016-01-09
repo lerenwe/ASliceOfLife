@@ -12,15 +12,17 @@ public class subSceneExit : MonoBehaviour {
     public bool touchToExit;
     [HideInInspector]
     public bool playerIsTouchingExit = false;
+
     bool preRequisitesMatch = false;
 
     [SerializeField]
     bool dontTeleportOnExit = false;
 
-    ChoiceLoader choiceLoader;
+    [HideInInspector]
+    public ChoiceLoader choiceLoader;
 
     [SerializeField]
-    List<Choice> preRequisiteChoices = new List<Choice>();
+    public List<Choice> preRequisiteChoices = new List<Choice>();
 
     [SerializeField]
     List<Choice> makeChoice = new List<Choice>();
@@ -136,6 +138,8 @@ public class subSceneExit : MonoBehaviour {
 
     public virtual IEnumerator Exit ()
     {
+        Debug.Log("Base Exit called");
+
         if(!dontTeleportOnExit)
             yield return StartCoroutine(GameStateManager.FadeOut());
 

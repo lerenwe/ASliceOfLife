@@ -23,6 +23,7 @@ public class PlayerControls : MonoBehaviour {
 
     [SerializeField]
     LayerMask groundLayer;
+    public bool shoveAnimFinished = false;
 
     // Use this for initialization
     void Start ()
