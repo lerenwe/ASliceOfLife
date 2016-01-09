@@ -70,9 +70,9 @@ public class GameStateManager : MonoBehaviour {
 
         Debug.Log("Fade In");
         FadingIn = true;
-        FadeImage.CrossFadeColor(new Color(0, 0, 0, 0), 2f, false, true);
+        FadeImage.CrossFadeColor(new Color(0, 0, 0, 0), 1f, false, true);
         player.GetComponent<PlayerControls>().canControl = false;
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(1f);
         player.GetComponent<PlayerControls>().canControl = true;
         FadingIn = false;
 
@@ -83,9 +83,9 @@ public class GameStateManager : MonoBehaviour {
     {
         Debug.Log("Fade Out");
         FadingOut = true;
-        FadeImage.CrossFadeColor(new Color(0, 0, 0, 1), 2f, false, true);
+        FadeImage.CrossFadeColor(new Color(0, 0, 0, 1), 1f, false, true);
         player.GetComponent<PlayerControls>().canControl = false;
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(1f);
         player.GetComponent<PlayerControls>().canControl = true;
         FadingOut = false;
     }
