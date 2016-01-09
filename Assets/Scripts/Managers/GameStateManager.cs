@@ -60,11 +60,19 @@ public class GameStateManager : MonoBehaviour {
 
     public static IEnumerator FadeIn ()
     {
+        yield return new WaitForSeconds(Time.deltaTime);
+
+        Debug.Log("Waiting for player to be grounded...");
+        Debug.Log("Player grounded = " + GameStateManager.player.GetComponent<PlayerControls>().isGrounded);
+        while (!GameStateManager.player.GetComponent<PlayerControls>().isGrounded)
+            yield return null;
+        Debug.Log("Player is grounded, proceeding...");
+
         Debug.Log("Fade In");
         FadingIn = true;
-        FadeImage.CrossFadeColor(new Color(0, 0, 0, 0), 1f, false, true);
+        FadeImage.CrossFadeColor(new Color(0, 0, 0, 0), 2f, false, true);
         player.GetComponent<PlayerControls>().canControl = false;
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(2f);
         player.GetComponent<PlayerControls>().canControl = true;
         FadingIn = false;
 
@@ -75,9 +83,9 @@ public class GameStateManager : MonoBehaviour {
     {
         Debug.Log("Fade Out");
         FadingOut = true;
-        FadeImage.CrossFadeColor(new Color(0, 0, 0, 1), 1f, false, true);
+        FadeImage.CrossFadeColor(new Color(0, 0, 0, 1), 2f, false, true);
         player.GetComponent<PlayerControls>().canControl = false;
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(2f);
         player.GetComponent<PlayerControls>().canControl = true;
         FadingOut = false;
     }

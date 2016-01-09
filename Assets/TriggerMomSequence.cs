@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class TriggerMomSequence : MonoBehaviour {
+public class TriggerMomSequence : subSceneExit {
 
     [SerializeField]
     GameObject BedSceneManger;
@@ -16,30 +16,29 @@ public class TriggerMomSequence : MonoBehaviour {
     GameObject doorExit;
 
 	// Use this for initialization
-	void Start () {
+	public override void Start ()
+    {
+        base.Start();
         parentSequenceScript = BedSceneManger.GetComponent<TalkToParentsSequence>();
 
         Player = GameObject.Find("Player");
         playerScript = Player.GetComponent<PlayerControls>();
         doorExit = GameObject.Find("Exit_Door");
 	}
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
 
-    void OnTriggerEnter2D (Collider2D hit)
+    public override void OnTriggerEnter2D (Collider2D hit)
     {
+        base.OnTriggerEnter2D(hit);
         if (hit.CompareTag ("Player") && !AlreadyTrigger)
         {
-            Debug.Log("Triggah Triggah");
+            Debug.Log("Triggah dah mom");
             StartCoroutine (AnswerToMom());
         }
     }
 
     IEnumerator AnswerToMom ()
     {
+        
         momObject.GetComponent<SpriteRenderer>().enabled = true;
         playerScript.canControl = false;
         AlreadyTrigger = true;

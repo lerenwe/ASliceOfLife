@@ -10,13 +10,19 @@ public class PlayerControls : MonoBehaviour {
     public Vector3 moveDirection;
     [HideInInspector]
     public bool canControl = true;
+    [HideInInspector]
+    public bool isGrounded = false;
     #endregion
 
     #region My Components Variables
     Rigidbody2D rigidBody;
     SpriteRenderer spriteRenderer;
     Animator animator;
+    float distToGround;
     #endregion
+
+    [SerializeField]
+    LayerMask groundLayer;
 
     // Use this for initialization
     void Start ()
@@ -26,6 +32,8 @@ public class PlayerControls : MonoBehaviour {
         spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
         animator = gameObject.GetComponent<Animator>();
         #endregion
+
+        distToGround = gameObject.GetComponent<Collider2D>().bounds.extents.y;
     }
 
     // Update is called once per frame
@@ -38,9 +46,38 @@ public class PlayerControls : MonoBehaviour {
         else
             moveDirection = Vector3.zero;
 
+        Debug.DrawRay(transform.position, -Vector3.up * (distToGround + .1f));
+
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, -Vector2.up, distToGround + 0.1f, groundLayer);
+
+        if (hit.collider != null)
+        {
+            if (hit.transform.CompareTag("Ground"))
+            {
+                isGrounded = true;
+            }
+            else
+            {
+                isGrounded = false;
+            }
+        }
+        else
+        {
+            isGrounded = false;
+        }
+
         ManageSprite();
         ManageAnimator();
 	}
+
+    public IEnumerator isPlayerGrounded ()
+    {
+        while (!isGrounded)
+        {
+            Debug.Log("YUP IT'S GROUNDED");
+            yield return true;
+        }
+    }
 
     void Move ()
     {

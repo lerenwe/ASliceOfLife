@@ -14,6 +14,9 @@ public class subSceneExit : MonoBehaviour {
     public bool playerIsTouchingExit = false;
     bool preRequisitesMatch = false;
 
+    [SerializeField]
+    bool dontTeleportOnExit = false;
+
     ChoiceLoader choiceLoader;
 
     [SerializeField]
@@ -35,7 +38,7 @@ public class subSceneExit : MonoBehaviour {
     int backGroundNumberToUse;
 
     // Use this for initialization
-    void Start () {
+    public virtual void Start () {
         choiceLoader = GameObject.Find("GameStateManager").GetComponent<ChoiceLoader>();
         //preRequisiteChoices = choiceLoader.everyChoices.choices;
 
@@ -64,7 +67,7 @@ public class subSceneExit : MonoBehaviour {
     void Awake ()
     {
         #region check if mandatory components & objects are present
-        if (destinationPoint == null)
+        if (destinationPoint == null && !dontTeleportOnExit)
             Debug.LogError(gameObject.name + " needs a destination point!");
         #endregion
     }
@@ -108,7 +111,6 @@ public class subSceneExit : MonoBehaviour {
     {
         if (touchToExit)
         {
-            Debug.Log("BAH ALORS ?!");
             if (hit == GameStateManager.playerCollider)
                 StartCoroutine (Exit());
         }
@@ -134,7 +136,8 @@ public class subSceneExit : MonoBehaviour {
 
     public virtual IEnumerator Exit ()
     {
-        yield return StartCoroutine(GameStateManager.FadeOut());
+        if(!dontTeleportOnExit)
+            yield return StartCoroutine(GameStateManager.FadeOut());
 
         //Update choice list
         int countChoiceCheck = 0;
@@ -152,21 +155,24 @@ public class subSceneExit : MonoBehaviour {
 
         countChoiceCheck = 0;
 
-        #region If necessary, change an exit's target point
-        foreach (GameObject exit in ExitToModify)
+        if (!dontTeleportOnExit)
         {
-            if (exit != null && NewTargetPoint != null)
-                exit.GetComponent<subSceneExit>().destinationPoint = NewTargetPoint;
+            #region If necessary, change an exit's target point
+            foreach (GameObject exit in ExitToModify)
+            {
+                if (exit != null && NewTargetPoint != null)
+                    exit.GetComponent<subSceneExit>().destinationPoint = NewTargetPoint;
+            }
+            #endregion
+
+            #region If necessary, change a background
+            if (targetBackGroundChangeScript != null && backGroundNumberToUse != null)
+                targetBackGroundChangeScript.changeBackground(backGroundNumberToUse);
+            #endregion
+
+            GameStateManager.player.transform.position = destinationPoint.transform.position;
+
+            StartCoroutine(GameStateManager.FadeIn());
         }
-        #endregion
-
-        #region If necessary, change a background
-        if (targetBackGroundChangeScript != null && backGroundNumberToUse != null)
-            targetBackGroundChangeScript.changeBackground(backGroundNumberToUse);
-        #endregion
-
-        GameStateManager.player.transform.position = destinationPoint.transform.position;
-
-        StartCoroutine (GameStateManager.FadeIn());
     }
 }
