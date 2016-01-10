@@ -49,23 +49,7 @@ public class PlayerControls : MonoBehaviour {
 
         Debug.DrawRay(transform.position, -Vector3.up * (distToGround + .1f));
 
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, -Vector2.up, distToGround + 0.1f, groundLayer);
-
-        if (hit.collider != null)
-        {
-            if (hit.transform.CompareTag("Ground"))
-            {
-                isGrounded = true;
-            }
-            else
-            {
-                isGrounded = false;
-            }
-        }
-        else
-        {
-            isGrounded = false;
-        }
+       
 
         ManageSprite();
         ManageAnimator();
@@ -84,8 +68,44 @@ public class PlayerControls : MonoBehaviour {
     {
         moveDirection = (new Vector2(Input.GetAxisRaw("Horizontal"), 0));
 
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, -Vector2.up, distToGround + 0.3f, groundLayer);
+
+        if (hit.collider != null)
+        {
+            if (hit.transform.CompareTag("Ground"))
+            {
+                isGrounded = true;
+
+                Vector3 perpendicularMoveDir;
+                perpendicularMoveDir = new Vector2(-hit.normal.y, hit.normal.x) / Mathf.Sqrt((hit.normal.x * hit.normal.x) + (hit.normal.y * hit.normal.y));
+
+                if (Input.GetAxisRaw("Horizontal") < 0)
+                    moveDirection = perpendicularMoveDir;
+                else if (Input.GetAxisRaw("Horizontal") > 0)
+                    moveDirection = -perpendicularMoveDir;
+
+                Debug.DrawLine(moveDirection * 5, moveDirection * -5, Color.green);
+                /*
+                v = P2 - P1
+                P3 = (-v.y, v.x) / Sqrt(v.x^2 + v.y^2) * h
+                P4 = (-v.y, v.x) / Sqrt(v.x^2 + v.y^2) * -h
+                */
+            }
+            else
+            {
+                isGrounded = false;
+                //gameObject.GetComponent<Rigidbody2D>().gravityScale = 30;
+            }
+        }
+        else
+        {
+            isGrounded = false;
+        }
+
         //Apply moves
         rigidBody.velocity = moveDirection * speedMultiplier;
+
+        Debug.DrawRay(transform.position, moveDirection * speedMultiplier, Color.red);
     }
 
     void ManageSprite()

@@ -10,8 +10,6 @@ public class TalkToParentsSequence : MonoBehaviour {
     [SerializeField]
     GameObject[] ExitZones;
     [SerializeField]
-    GameObject newDestinationPoint;
-    [SerializeField]
     GameObject mom_Exit;
 
     [HideInInspector]
@@ -34,15 +32,6 @@ public class TalkToParentsSequence : MonoBehaviour {
             triggeredSequence = true;
             mom_Exit.GetComponent<BoxCollider2D>().enabled = true;
             Debug.Log("Knock knock!");
-        }
-
-        if (sequenceEnded)
-        {
-            foreach (GameObject exit in ExitZones)
-            {
-                exit.GetComponent<subSceneExit>().destinationPoint = newDestinationPoint;
-                Debug.Log("Exit to Dream Sequence set");
-            }
         }
     }
 }
