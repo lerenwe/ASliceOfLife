@@ -12,6 +12,8 @@ public class PlayerControls : MonoBehaviour {
     public bool canControl = true;
     [HideInInspector]
     public bool isGrounded = false;
+
+    public float gravity = 20f;
     #endregion
 
     #region My Components Variables
@@ -102,8 +104,13 @@ public class PlayerControls : MonoBehaviour {
             isGrounded = false;
         }
 
+        if (!isGrounded)
+            moveDirection.y = -gravity;
+        else
+            moveDirection.y = 0;
+
         //Apply moves
-        rigidBody.velocity = moveDirection * speedMultiplier;
+        transform.Translate ( moveDirection * speedMultiplier * Time.deltaTime);
 
         Debug.DrawRay(transform.position, moveDirection * speedMultiplier, Color.red);
     }
@@ -111,9 +118,9 @@ public class PlayerControls : MonoBehaviour {
     void ManageSprite()
     {
     //Flip sprite to face move direction
-        if (rigidBody.velocity.x < 0)
+        if (moveDirection.x < 0)
             spriteRenderer.flipX = true;
-        else if (rigidBody.velocity.x > 0)
+        else if (moveDirection.x > 0)
             spriteRenderer.flipX = false;
     }
 
