@@ -18,6 +18,7 @@ public class PlayerControls : MonoBehaviour {
 
     #region My Components Variables
     Rigidbody2D rigidBody;
+    BoxCollider2D boxCollider;
     SpriteRenderer spriteRenderer;
     Animator animator;
     float distToGround;
@@ -25,6 +26,10 @@ public class PlayerControls : MonoBehaviour {
 
     [SerializeField]
     LayerMask groundLayer;
+    [SerializeField]
+    LayerMask wallLayer;
+
+    [HideInInspector]
     public bool shoveAnimFinished = false;
 
     // Use this for initialization
@@ -34,6 +39,7 @@ public class PlayerControls : MonoBehaviour {
         rigidBody = gameObject.GetComponent<Rigidbody2D>();
         spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
         animator = gameObject.GetComponent<Animator>();
+        boxCollider = gameObject.GetComponent<BoxCollider2D>();
         #endregion
 
         distToGround = gameObject.GetComponent<Collider2D>().bounds.extents.y;
@@ -69,6 +75,18 @@ public class PlayerControls : MonoBehaviour {
     void Move ()
     {
         moveDirection = (new Vector2(Input.GetAxisRaw("Horizontal"), 0));
+
+        //Let's use a RayCast to prevent the player bouncing against walls...
+        // OVER HERE ! Bon alors, adapte le code pour qu'il fonctionne dans les deux sens, et finit le pour que quand un mur est detecté, on ne puisse plus bouger
+        // le perso dans ce sens. Troudbal. Tu sais que tu codes pas si mal, toi ? <3
+        Vector2 rayStart = new Vector2(transform.position.x + boxCollider.bounds.extents.x, transform.position.y - boxCollider.bounds.extents.y);
+        Vector2 rayEnd = new Vector2(rayStart.x + .1f, rayStart.y + boxCollider.bounds.size.y);
+        RaycastHit2D hitAWall = Physics2D.Linecast(rayStart, rayEnd, wallLayer);
+
+        Debug.DrawLine(rayStart, rayEnd, Color.blue);
+
+        if (hitAWall.collider != null)
+            Debug.Log("HIT A WALL, OUUUUUCH");
 
         RaycastHit2D hit = Physics2D.Raycast(transform.position, -Vector2.up, distToGround + 0.3f, groundLayer);
 
