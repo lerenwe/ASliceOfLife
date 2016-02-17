@@ -87,7 +87,8 @@ public class PlayerControls : MonoBehaviour {
                     moveDirection = -perpendicularMoveDir;
 
                 Debug.DrawLine(moveDirection * 5, moveDirection * -5, Color.green);
-                /*
+                
+                /* Finding a perpendicular to the ground line...
                 v = P2 - P1
                 P3 = (-v.y, v.x) / Sqrt(v.x^2 + v.y^2) * h
                 P4 = (-v.y, v.x) / Sqrt(v.x^2 + v.y^2) * -h
@@ -102,12 +103,8 @@ public class PlayerControls : MonoBehaviour {
         else
         {
             isGrounded = false;
+            //gameObject.GetComponent<Rigidbody2D>().gravityScale = 30;
         }
-
-        if (!isGrounded)
-            moveDirection.y = -gravity;
-        else
-            moveDirection.y = 0;
 
         //Apply moves
         transform.Translate ( moveDirection * speedMultiplier * Time.deltaTime);

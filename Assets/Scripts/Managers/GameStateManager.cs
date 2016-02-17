@@ -21,6 +21,7 @@ public class GameStateManager : MonoBehaviour {
     {
         player = GameObject.Find("Player");
         playerCollider = player.GetComponent<BoxCollider2D>();
+
         FadeImage = GameObject.Find("BlackPic").GetComponent<Image>();
 
         subScenes = GameObject.FindGameObjectsWithTag("subScene");
