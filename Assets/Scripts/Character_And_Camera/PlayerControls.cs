@@ -74,43 +74,51 @@ public class PlayerControls : MonoBehaviour {
 
     void Move ()
     {
-        moveDirection = (new Vector2(Input.GetAxisRaw("Horizontal"), 0));
+        moveDirection = (new Vector2(Input.GetAxisRaw("Horizontal"), 0)); //This lines makes sure that if there's no input, the player will stand still.
 
-        //Let's use a RayCast to prevent the player bouncing against walls...
-        // OVER HERE ! Bon alors, adapte le code pour qu'il fonctionne dans les deux sens, et finit le pour que quand un mur est detecté, on ne puisse plus bouger
-        // le perso dans ce sens. Troudbal. Tu sais que tu codes pas si mal, toi ? <3
-        Vector2 rayStart = new Vector2(transform.position.x + boxCollider.bounds.extents.x, transform.position.y - boxCollider.bounds.extents.y);
-        Vector2 rayEnd = new Vector2(rayStart.x + .1f, rayStart.y + boxCollider.bounds.size.y);
-        RaycastHit2D hitAWall = Physics2D.Linecast(rayStart, rayEnd, wallLayer);
-
-        Debug.DrawLine(rayStart, rayEnd, Color.blue);
-
-        if (hitAWall.collider != null)
-            Debug.Log("HIT A WALL, OUUUUUCH");
 
         RaycastHit2D hit = Physics2D.Raycast(transform.position, -Vector2.up, distToGround + 0.3f, groundLayer);
+        RaycastHit2D hitLeft = Physics2D.Raycast(new Vector2 (transform.position.x - boxCollider.bounds.extents.x - .1f, transform.position.y), -Vector2.up, distToGround + 0.3f, groundLayer);
+        RaycastHit2D hitRight = Physics2D.Raycast(new Vector2(transform.position.x + boxCollider.bounds.extents.x + .1f, transform.position.y), -Vector2.up, distToGround + 0.3f, groundLayer);
+        //Vector2 circleCastOrigin = new Vector2(transform.position.x, transform.position.y - boxCollider.bounds.extents.y);
+        //RaycastHit2D hit = Physics2D.CircleCast(circleCastOrigin, boxCollider.bounds.extents.y, -Vector2.up, distToGround + 0.3f, groundLayer);
 
-        if (hit.collider != null)
+        RaycastHit2D[] groundTests = new RaycastHit2D[3];
+        groundTests[0] = hit;
+        groundTests[1] = hitLeft;
+        groundTests[2] = hitRight;
+
+
+        foreach (RaycastHit2D a_hit in groundTests)
         {
-            if (hit.transform.CompareTag("Ground"))
+            if (a_hit.collider != null)
             {
-                isGrounded = true;
+                if (a_hit.transform.CompareTag("Ground"))
+                {
+                    isGrounded = true;
 
-                Vector3 perpendicularMoveDir;
-                perpendicularMoveDir = new Vector2(-hit.normal.y, hit.normal.x) / Mathf.Sqrt((hit.normal.x * hit.normal.x) + (hit.normal.y * hit.normal.y));
+                    Vector3 perpendicularMoveDir;
+                    perpendicularMoveDir = new Vector2(-a_hit.normal.y, a_hit.normal.x) / Mathf.Sqrt((a_hit.normal.x * a_hit.normal.x) + (a_hit.normal.y * a_hit.normal.y));
 
-                if (Input.GetAxisRaw("Horizontal") < 0)
-                    moveDirection = perpendicularMoveDir;
-                else if (Input.GetAxisRaw("Horizontal") > 0)
-                    moveDirection = -perpendicularMoveDir;
+                    if (Input.GetAxisRaw("Horizontal") < 0)
+                        moveDirection = perpendicularMoveDir;
+                    else if (Input.GetAxisRaw("Horizontal") > 0)
+                        moveDirection = -perpendicularMoveDir;
 
-                Debug.DrawLine(moveDirection * 5, moveDirection * -5, Color.green);
-                
-                /* Finding a perpendicular to the ground line...
-                v = P2 - P1
-                P3 = (-v.y, v.x) / Sqrt(v.x^2 + v.y^2) * h
-                P4 = (-v.y, v.x) / Sqrt(v.x^2 + v.y^2) * -h
-                */
+                    Debug.DrawLine(moveDirection * 5, moveDirection * -5, Color.green);
+
+                    /* Finding a perpendicular to the ground line...
+                    v = P2 - P1
+                    P3 = (-v.y, v.x) / Sqrt(v.x^2 + v.y^2) * h
+                    P4 = (-v.y, v.x) / Sqrt(v.x^2 + v.y^2) * -h
+                    */
+                    break;
+                }
+                else
+                {
+                    isGrounded = false;
+                    //gameObject.GetComponent<Rigidbody2D>().gravityScale = 30;
+                }
             }
             else
             {
@@ -118,14 +126,46 @@ public class PlayerControls : MonoBehaviour {
                 //gameObject.GetComponent<Rigidbody2D>().gravityScale = 30;
             }
         }
-        else
+
+
+
+        //Let's use a RayCast to prevent the player bouncing against walls...
+        // OVER HERE ! Bon alors, adapte le code pour qu'il fonctionne dans les deux sens, et finit le pour que quand un mur est detecté, on ne puisse plus bouger
+        // le perso dans ce sens. Troudbal. Tu sais que tu codes pas si mal, toi ? <3
+        Vector2 rayStart = Vector2.zero;
+        Vector2 rayEnd = Vector2.zero;
+
+        if (Input.GetAxisRaw("Horizontal") < 0)
         {
-            isGrounded = false;
-            //gameObject.GetComponent<Rigidbody2D>().gravityScale = 30;
+            rayStart = new Vector2(transform.position.x - boxCollider.bounds.extents.x, transform.position.y + boxCollider.bounds.extents.y);
+            rayEnd = new Vector2(rayStart.x - .1f, rayStart.y - boxCollider.bounds.size.y);
+        }
+        else if (Input.GetAxisRaw("Horizontal") > 0)
+        {
+            rayStart = new Vector2(transform.position.x + boxCollider.bounds.extents.x, transform.position.y - boxCollider.bounds.extents.y);
+            rayEnd = new Vector2(rayStart.x + .1f, transform.position.y + boxCollider.bounds.size.y);
         }
 
-        //Apply moves
-        transform.Translate ( moveDirection * speedMultiplier * Time.deltaTime);
+        if (Input.GetAxisRaw("Horizontal") != 0)
+        {
+            RaycastHit2D hitAWall = Physics2D.Linecast(rayStart, rayEnd, wallLayer);
+            Debug.DrawLine(rayStart, rayEnd, Color.blue);
+
+            if (hitAWall.collider != null)
+            {
+                if (moveDirection.x > 0)
+                {
+                    moveDirection = Vector2.zero;
+                    Debug.Log("HIT A WALL ON THE RIGHT, OUUUUUCH");
+                }
+            }
+        }
+
+        if (!isGrounded)
+            moveDirection = Vector2.zero;
+
+            //Apply moves
+            transform.Translate ( moveDirection * speedMultiplier * Time.deltaTime);
 
         Debug.DrawRay(transform.position, moveDirection * speedMultiplier, Color.red);
     }
