@@ -46,7 +46,7 @@ public class PlayerControls : MonoBehaviour {
     }
 
     // Update is called once per frame
-    void Update ()
+    void FixedUpdate()
     {
         if (canControl)
         {
@@ -54,10 +54,13 @@ public class PlayerControls : MonoBehaviour {
         }
         else
             moveDirection = Vector3.zero;
+    }
+
+    void Update ()
+    {
+
 
         Debug.DrawRay(transform.position, -Vector3.up * (distToGround + .1f));
-
-       
 
         ManageSprite();
         ManageAnimator();
@@ -124,40 +127,6 @@ public class PlayerControls : MonoBehaviour {
             {
                 isGrounded = false;
                 //gameObject.GetComponent<Rigidbody2D>().gravityScale = 30;
-            }
-        }
-
-
-
-        //Let's use a RayCast to prevent the player bouncing against walls...
-        // OVER HERE ! Bon alors, adapte le code pour qu'il fonctionne dans les deux sens, et finit le pour que quand un mur est detecté, on ne puisse plus bouger
-        // le perso dans ce sens. Troudbal. Tu sais que tu codes pas si mal, toi ? <3
-        Vector2 rayStart = Vector2.zero;
-        Vector2 rayEnd = Vector2.zero;
-
-        if (Input.GetAxisRaw("Horizontal") < 0)
-        {
-            rayStart = new Vector2(transform.position.x - boxCollider.bounds.extents.x, transform.position.y + boxCollider.bounds.extents.y);
-            rayEnd = new Vector2(rayStart.x - .1f, rayStart.y - boxCollider.bounds.size.y);
-        }
-        else if (Input.GetAxisRaw("Horizontal") > 0)
-        {
-            rayStart = new Vector2(transform.position.x + boxCollider.bounds.extents.x, transform.position.y - boxCollider.bounds.extents.y);
-            rayEnd = new Vector2(rayStart.x + .1f, transform.position.y + boxCollider.bounds.size.y);
-        }
-
-        if (Input.GetAxisRaw("Horizontal") != 0)
-        {
-            RaycastHit2D hitAWall = Physics2D.Linecast(rayStart, rayEnd, wallLayer);
-            Debug.DrawLine(rayStart, rayEnd, Color.blue);
-
-            if (hitAWall.collider != null)
-            {
-                if (moveDirection.x > 0)
-                {
-                    moveDirection = Vector2.zero;
-                    Debug.Log("HIT A WALL ON THE RIGHT, OUUUUUCH");
-                }
             }
         }
 
