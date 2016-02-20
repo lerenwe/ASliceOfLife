@@ -70,6 +70,7 @@ public class NPC : MonoBehaviour {
 
         if (moveTowardPlayer)
         {
+            Debug.Log(this.name + " walking toward Player.");
             distToTarget = transform.position.x - player.transform.position.x;
             distToTarget = Mathf.Abs(distToTarget);
 

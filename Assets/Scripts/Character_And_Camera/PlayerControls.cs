@@ -58,8 +58,6 @@ public class PlayerControls : MonoBehaviour {
 
     void Update ()
     {
-
-
         Debug.DrawRay(transform.position, -Vector3.up * (distToGround + .1f));
 
         ManageSprite();
@@ -79,18 +77,14 @@ public class PlayerControls : MonoBehaviour {
     {
         moveDirection = (new Vector2(Input.GetAxisRaw("Horizontal"), 0)); //This lines makes sure that if there's no input, the player will stand still.
 
-
         RaycastHit2D hit = Physics2D.Raycast(transform.position, -Vector2.up, distToGround + 0.3f, groundLayer);
         RaycastHit2D hitLeft = Physics2D.Raycast(new Vector2 (transform.position.x - boxCollider.bounds.extents.x - .1f, transform.position.y), -Vector2.up, distToGround + 0.3f, groundLayer);
         RaycastHit2D hitRight = Physics2D.Raycast(new Vector2(transform.position.x + boxCollider.bounds.extents.x + .1f, transform.position.y), -Vector2.up, distToGround + 0.3f, groundLayer);
-        //Vector2 circleCastOrigin = new Vector2(transform.position.x, transform.position.y - boxCollider.bounds.extents.y);
-        //RaycastHit2D hit = Physics2D.CircleCast(circleCastOrigin, boxCollider.bounds.extents.y, -Vector2.up, distToGround + 0.3f, groundLayer);
 
         RaycastHit2D[] groundTests = new RaycastHit2D[3];
         groundTests[0] = hit;
         groundTests[1] = hitLeft;
         groundTests[2] = hitRight;
-
 
         foreach (RaycastHit2D a_hit in groundTests)
         {
@@ -120,13 +114,11 @@ public class PlayerControls : MonoBehaviour {
                 else
                 {
                     isGrounded = false;
-                    //gameObject.GetComponent<Rigidbody2D>().gravityScale = 30;
                 }
             }
             else
             {
                 isGrounded = false;
-                //gameObject.GetComponent<Rigidbody2D>().gravityScale = 30;
             }
         }
 
