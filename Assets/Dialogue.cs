@@ -14,6 +14,8 @@ public class Dialogue : MonoBehaviour {
     float nextCharacterTimer;
     public float displaySpeedRate = 1f;
     public float spaceBetweenLines = .2f;
+    public float xMargin = 0;
+    public float yMargin = 0;
     public Color textColor = Color.white;
     float firstWordYPos;
     float firstWordXPos;
@@ -27,19 +29,16 @@ public class Dialogue : MonoBehaviour {
 
     Text textComponent;
 
+    bool firstWordMustSpawn = true;
+
 	// Use this for initialization
 	void Start ()
     {
         bubbleBackImage = gameObject.GetComponentInChildren<Image>();
-        bubbleBackRectTransform = bubbleBackImage.GetComponent<RectTransform>();
+        bubbleBackRectTransform = bubbleBackImage.gameObject.GetComponent<RectTransform>();
         textComponent = this.GetComponent<Text>();
         DisplayNewText(textToDisplay);
-        justSpawnedRectTransform = this.GetComponent<RectTransform>();
-        targetYPos = justSpawnedRectTransform.position.y;
-        firstWordYPos = justSpawnedRectTransform.position.y;
-        firstWordXPos = justSpawnedRectTransform.position.x;
-        //Bubble size
-        
+            
 	}
 	
 	// Update is called once per frame
@@ -52,36 +51,66 @@ public class Dialogue : MonoBehaviour {
 
         if (nextCharacterTimer > displaySpeedRate && i < currentWordsToDisplay.Length)
         {
+
             GameObject spawnedNewWord = Object.Instantiate(wordPrefab) as GameObject;
+
+            if(!firstWordMustSpawn)
+                spawnedNewWord.GetComponent<WordNextToFirstTest>().previousWord = justSpawnedRectTransform;
+
 
             Text newWordText = spawnedNewWord.GetComponent<Text>();
             newWordText.text += currentWordsToDisplay[i];
             newWordText.color = textColor;
             spawnedNewWord.transform.name = currentWordsToDisplay[i];
             newWordText.text += " ";
-            spawnedNewWord.GetComponent<ContentSizeFitter>().SetLayoutHorizontal();
-            spawnedNewWord.GetComponent<ContentSizeFitter>().SetLayoutVertical();
 
-            spawnedNewWord.GetComponent<RectTransform>().position = new Vector3 (justSpawnedRectTransform.position.x, targetYPos, 0)
-            + new Vector3(justSpawnedRectTransform.rect.xMax 
-            + spawnedNewWord.GetComponent<RectTransform>().rect.size.x / 2, 0, 0);
+            //spawnedNewWord.GetComponent<ContentSizeFitter>().SetLayoutHorizontal();
+            //spawnedNewWord.GetComponent<ContentSizeFitter>().SetLayoutVertical();
+            //newWordText.resizeTextForBestFit = true;
 
-            //If new word go past bubble horizontal boundaries....
-            float currentWordXBoundary = spawnedNewWord.GetComponent<RectTransform>().position.x + spawnedNewWord.GetComponent<RectTransform>().rect.size.x / 2;
-            float currentBubbleXBoundary = bubbleBackRectTransform.position.x + bubbleBackRectTransform.rect.size.x / 2 ;
-
-            if (currentWordXBoundary > currentBubbleXBoundary)
+            if (firstWordMustSpawn)
             {
-                Debug.Log("CLEARLY, YOU HAVE CROSSED THE LINE, BITCH");
-                targetYPos = firstWordYPos - justSpawnedRectTransform.rect.size.y / 2 - spaceBetweenLines;
+                justSpawnedRectTransform = spawnedNewWord.GetComponent<RectTransform>();
 
-                spawnedNewWord.GetComponent<RectTransform>().position = new Vector3(firstWordXPos, targetYPos, 0);
+                Debug.Log("JustSpawnedRectSize is " + justSpawnedRectTransform.rect.size.x);
 
-                firstWordXPos = spawnedNewWord.GetComponent<RectTransform>().position.x;
-                firstWordYPos = spawnedNewWord.GetComponent<RectTransform>().position.y;
+                firstWordXPos = bubbleBackRectTransform.position.x /*+ xMargin*/;
+                firstWordYPos = bubbleBackRectTransform.position.y /*- yMargin*/;
+                spawnedNewWord.GetComponent<RectTransform>().position = new Vector2(firstWordXPos, firstWordYPos);
+
+                targetYPos = justSpawnedRectTransform.position.y;
             }
 
-            spawnedNewWord.transform.SetParent(mainCanvas.transform);
+                spawnedNewWord.GetComponent<WordNextToFirstTest>().targetYPos = targetYPos;
+
+            if (!firstWordMustSpawn)
+            {
+                spawnedNewWord.GetComponent<RectTransform>().position = new Vector3(justSpawnedRectTransform.position.x, targetYPos, 0)
+                + new Vector3(justSpawnedRectTransform.rect.xMax
+                + spawnedNewWord.GetComponent<RectTransform>().rect.size.x / 2, 0, 0);
+            }
+
+            //If new word go past bubble horizontal boundaries....
+            if (!firstWordMustSpawn)
+            {
+                float currentWordXBoundary = spawnedNewWord.GetComponent<RectTransform>().position.x + spawnedNewWord.GetComponent<RectTransform>().rect.size.x / 2;
+                float currentBubbleXBoundary = bubbleBackRectTransform.position.x + bubbleBackRectTransform.rect.size.x / 2;
+
+
+                if (currentWordXBoundary > currentBubbleXBoundary && !firstWordMustSpawn)
+                {
+                    Debug.Log("CLEARLY, YOU HAVE CROSSED THE LINE, BITCH");
+                    targetYPos = firstWordYPos - justSpawnedRectTransform.rect.size.y / 2 - spaceBetweenLines;
+
+                    spawnedNewWord.GetComponent<RectTransform>().position = new Vector3(firstWordXPos, targetYPos, 0);
+
+                    firstWordXPos = spawnedNewWord.GetComponent<RectTransform>().position.x;
+                    firstWordYPos = spawnedNewWord.GetComponent<RectTransform>().position.y;
+                }
+            }
+
+
+            spawnedNewWord.transform.SetParent(this.transform);
 
             i++;
             nextCharacterTimer = 0;
@@ -93,6 +122,8 @@ public class Dialogue : MonoBehaviour {
                 targetYPos = justSpawnedRectTransform.position.y;
                 jumpToNextLine = false;
             }
+
+            firstWordMustSpawn = false;
         }
 	}
     
