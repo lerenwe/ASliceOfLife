@@ -12,7 +12,9 @@ public class WordNextToFirstTest : MonoBehaviour {
 
     RectTransform mahRectTransform;
     public Vector3 startPos;
+    bool secondUpdateCall = false;
     bool begin = true;
+    bool brokeLineOnce = false;
 
 
 
@@ -23,33 +25,45 @@ public class WordNextToFirstTest : MonoBehaviour {
         mahRectTransform.localScale = Vector3.one;
     }
 
+
+
     // Update is called once per frame
     void LateUpdate () {
 
         #region Set Word Start Position
-        float xPos = 0f;
-        float yPos = 0f;
-
-        if (firstWord)
+        if (secondUpdateCall)
         {
-            //We need to place the first word in the upper-left corner of the bubble, so let's get the corners first.
-            Vector3[] corners = new Vector3[4];
-            parentDialogue.bubbleBackRectTransform.GetWorldCorners(corners);
+            float targetxPos = 0f;
+            float targetyPos = 0f;
 
-            xPos = corners[1].x + mahRectTransform.rect.width * parentDialogue.canvas.scaleFactor / 2 + parentDialogue.xMargin;
-            yPos = corners[1].y - mahRectTransform.rect.height * parentDialogue.canvas.scaleFactor / 2 - parentDialogue.yMargin;
+            if (firstWord)
+            {
+                //We need to place the first word in the upper-left corner of the bubble, so let's get the corners first.
+                Vector3[] corners = new Vector3[4];
+                parentDialogue.bubbleBackRectTransform.GetWorldCorners(corners);
+
+                targetxPos = corners[1].x + mahRectTransform.rect.width * parentDialogue.canvas.scaleFactor / 2 + parentDialogue.xMargin;
+                targetyPos = corners[1].y - mahRectTransform.rect.height * parentDialogue.canvas.scaleFactor / 2 - parentDialogue.yMargin;
+
+            if (begin)
+                parentDialogue.firstWordFromPreviousLine = mahRectTransform;
+            }
+            else
+            {
+                targetxPos = previousWord.position.x + mahRectTransform.rect.width * parentDialogue.canvas.scaleFactor / 2 + previousWord.rect.width * parentDialogue.canvas.scaleFactor / 2;
+                targetyPos = previousWord.position.y;
+            }
+
+            Vector2 targetStartPos = new Vector2(targetxPos, targetyPos);
+
+            startPos = IsLineOverflowingHorizontally(targetxPos, targetyPos) ? BreakLine() : targetStartPos;
+            #endregion
+
+            mahRectTransform.position = startPos;
+
+            begin = false;
         }
-        else
-        {
-            xPos = previousWord.position.x + mahRectTransform.rect.width * parentDialogue.canvas.scaleFactor / 2 + previousWord.rect.width * parentDialogue.canvas.scaleFactor / 2;
-            yPos = previousWord.position.y;
-        }
-
-        Vector2 targetStartPos = new Vector2(xPos, yPos);
-        startPos = targetStartPos;
-        #endregion
-
-        mahRectTransform.position = startPos;
+            secondUpdateCall = true;
         /*
                 if (firstWord)
                 {
@@ -85,5 +99,54 @@ public class WordNextToFirstTest : MonoBehaviour {
                     mahRectTransform.position = Vector3.SmoothDamp(mahRectTransform.position, targetPos, ref velocityNow, .08f);
                 }
                 */
+    }
+
+    bool IsLineOverflowingHorizontally(float targetXPos, float targetYPos)
+    {
+        float currentWordXBoundary = targetXPos + mahRectTransform.rect.width * parentDialogue.canvas.scaleFactor / 2;
+        float currentBubbleXBoundary = parentDialogue.bubbleBackRectTransform.position.x + parentDialogue.bubbleBackRectTransform.rect.width * parentDialogue.canvas.scaleFactor / 2;
+
+
+        if (currentWordXBoundary > currentBubbleXBoundary)
+        {
+            Debug.Log("CLEARLY, YOU HAVE CROSSED THE LINE, BITCH");
+            return true;
+
+        }
+        return false;
+    }
+
+    Vector2 BreakLine ()
+    {
+        float targetXPos;
+        float targetYPos;
+
+        if (!brokeLineOnce)
+        {
+            Vector3[] corners = new Vector3[4];
+            parentDialogue.bubbleBackRectTransform.GetWorldCorners(corners);
+
+            targetXPos = corners[1].x + mahRectTransform.rect.width * parentDialogue.canvas.scaleFactor / 2 + parentDialogue.xMargin;
+            targetYPos = parentDialogue.firstWordFromPreviousLine.position.y - mahRectTransform.rect.height * parentDialogue.canvas.scaleFactor - parentDialogue.spaceBetweenLines;
+
+            Debug.Log(this.name + " Line broke");
+        }
+        else
+        {
+            targetXPos = mahRectTransform.position.x;
+            targetYPos = mahRectTransform.position.y;
+        }
+
+        parentDialogue.firstWordFromPreviousLine = mahRectTransform;
+        brokeLineOnce = true;
+
+        return new Vector2(targetXPos, targetYPos);
+
+        /*targetYPos = firstWordYPos - previousWordRectTransform.rect.height * spawnedNewWord.GetComponent<WordNextToFirstTest>().canvas.scaleFactor / 2 - spaceBetweenLines;
+
+spawnedNewWord.GetComponent<RectTransform>().position = new Vector3(firstWordXPos, targetYPos, 0);
+
+firstWordXPos = spawnedNewWord.GetComponent<RectTransform>().position.x;
+firstWordYPos = spawnedNewWord.GetComponent<RectTransform>().position.y;*/
     }
 }

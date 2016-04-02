@@ -23,6 +23,7 @@ public class Dialogue : MonoBehaviour {
     public RectTransform previousWordRectTransform;
     Image bubbleBackImage;
     public RectTransform bubbleBackRectTransform;
+    public RectTransform firstWordFromPreviousLine;
 
     bool jumpToNextLine = true;
     float targetYPos;
