@@ -20,9 +20,9 @@ public class Dialogue : MonoBehaviour {
     float firstWordYPos;
     float firstWordXPos;
     int i = 0;
-    RectTransform justSpawnedRectTransform;
+    public RectTransform previousWordRectTransform;
     Image bubbleBackImage;
-    RectTransform bubbleBackRectTransform;
+    public RectTransform bubbleBackRectTransform;
 
     bool jumpToNextLine = true;
     float targetYPos;
@@ -31,67 +31,85 @@ public class Dialogue : MonoBehaviour {
 
     bool firstWordMustSpawn = true;
 
-	// Use this for initialization
-	void Start ()
+    public Canvas canvas;
+    GameObject canvasObject;
+
+    // Use this for initialization
+    void Start ()
     {
         bubbleBackImage = gameObject.GetComponentInChildren<Image>();
         bubbleBackRectTransform = bubbleBackImage.gameObject.GetComponent<RectTransform>();
         textComponent = this.GetComponent<Text>();
         DisplayNewText(textToDisplay);
-            
-	}
+
+        canvasObject = GameObject.Find("GameStateManager");
+        canvas = canvasObject.GetComponent<Canvas>();
+
+    }
+
+    GameObject SpawnWord ()
+    {
+        GameObject spawnedWord = Object.Instantiate(wordPrefab) as GameObject;
+        Text newWordText = spawnedWord.GetComponent<Text>();
+        newWordText.text += currentWordsToDisplay[i];
+        newWordText.color = textColor;
+        spawnedWord.transform.name = currentWordsToDisplay[i];
+        newWordText.text += " ";
+        return spawnedWord;
+    }
+
+    void setWordStartPos (bool isFirstWord, GameObject currentWord)
+    {
+        WordNextToFirstTest currentWordScript = currentWord.GetComponent<WordNextToFirstTest>();
+        currentWordScript.parentDialogue = this;
+
+        if (isFirstWord)
+            currentWordScript.firstWord = true;
+        else
+        {
+            currentWordScript.firstWord = false;
+            currentWordScript.previousWord = previousWordRectTransform;
+        }
+    }
 	
 	// Update is called once per frame
 	void Update () {
 
        nextCharacterTimer += Time.deltaTime;
-
-        //Let's check if the next word can be contained within the bubble
-
-
         if (nextCharacterTimer > displaySpeedRate && i < currentWordsToDisplay.Length)
         {
+            GameObject spawnedNewWord = SpawnWord();
+            setWordStartPos(firstWordMustSpawn, spawnedNewWord);
+            firstWordMustSpawn = false;
 
-            GameObject spawnedNewWord = Object.Instantiate(wordPrefab) as GameObject;
+            /*
+            if(previousWordRectTransform != null)
+                targetYPos = previousWordRectTransform.position.y;
 
-            if(!firstWordMustSpawn)
-                spawnedNewWord.GetComponent<WordNextToFirstTest>().previousWord = justSpawnedRectTransform;
+            if (!firstWordMustSpawn)
+                spawnedNewWord.GetComponent<WordNextToFirstTest>().previousWord = previousWordRectTransform;
 
 
-            Text newWordText = spawnedNewWord.GetComponent<Text>();
-            newWordText.text += currentWordsToDisplay[i];
-            newWordText.color = textColor;
-            spawnedNewWord.transform.name = currentWordsToDisplay[i];
-            newWordText.text += " ";
-
-            //spawnedNewWord.GetComponent<ContentSizeFitter>().SetLayoutHorizontal();
-            //spawnedNewWord.GetComponent<ContentSizeFitter>().SetLayoutVertical();
-            //newWordText.resizeTextForBestFit = true;
 
             if (firstWordMustSpawn)
             {
-                justSpawnedRectTransform = spawnedNewWord.GetComponent<RectTransform>();
-
-                Debug.Log("JustSpawnedRectSize is " + justSpawnedRectTransform.rect.size.x);
-
-                firstWordXPos = bubbleBackRectTransform.position.x /*+ xMargin*/;
-                firstWordYPos = bubbleBackRectTransform.position.y /*- yMargin*/;
-                spawnedNewWord.GetComponent<RectTransform>().position = new Vector2(firstWordXPos, firstWordYPos);
-
-                targetYPos = justSpawnedRectTransform.position.y;
+                previousWordRectTransform = spawnedNewWord.GetComponent<RectTransform>();
+                spawnedNewWord.GetComponent<WordNextToFirstTest>().firstWord = true;
+                spawnedNewWord.GetComponent<WordNextToFirstTest>().parentDialogue = this;
+                firstWordMustSpawn = false;
             }
 
-                spawnedNewWord.GetComponent<WordNextToFirstTest>().targetYPos = targetYPos;
+            spawnedNewWord.GetComponent<WordNextToFirstTest>().targetYPos = targetYPos;
 
             if (!firstWordMustSpawn)
             {
-                spawnedNewWord.GetComponent<RectTransform>().position = new Vector3(justSpawnedRectTransform.position.x, targetYPos, 0)
-                + new Vector3(justSpawnedRectTransform.rect.xMax
+                spawnedNewWord.GetComponent<RectTransform>().position = new Vector3(previousWordRectTransform.position.x, targetYPos, 0)
+                + new Vector3(previousWordRectTransform.rect.xMax
                 + spawnedNewWord.GetComponent<RectTransform>().rect.size.x / 2, 0, 0);
             }
 
             //If new word go past bubble horizontal boundaries....
-            if (!firstWordMustSpawn)
+            /*if (!firstWordMustSpawn)
             {
                 float currentWordXBoundary = spawnedNewWord.GetComponent<RectTransform>().position.x + spawnedNewWord.GetComponent<RectTransform>().rect.size.x / 2;
                 float currentBubbleXBoundary = bubbleBackRectTransform.position.x + bubbleBackRectTransform.rect.size.x / 2;
@@ -100,30 +118,25 @@ public class Dialogue : MonoBehaviour {
                 if (currentWordXBoundary > currentBubbleXBoundary && !firstWordMustSpawn)
                 {
                     Debug.Log("CLEARLY, YOU HAVE CROSSED THE LINE, BITCH");
-                    targetYPos = firstWordYPos - justSpawnedRectTransform.rect.size.y / 2 - spaceBetweenLines;
+                    targetYPos = firstWordYPos - previousWordRectTransform.rect.height * spawnedNewWord.GetComponent<WordNextToFirstTest>().canvas.scaleFactor / 2 - spaceBetweenLines;
 
                     spawnedNewWord.GetComponent<RectTransform>().position = new Vector3(firstWordXPos, targetYPos, 0);
 
                     firstWordXPos = spawnedNewWord.GetComponent<RectTransform>().position.x;
                     firstWordYPos = spawnedNewWord.GetComponent<RectTransform>().position.y;
                 }
-            }
+            }*/
 
-
+            /*if (jumpToNextLine)
+{
+    targetYPos = previousWordRectTransform.position.y;
+    jumpToNextLine = false;
+}*/
             spawnedNewWord.transform.SetParent(this.transform);
+            previousWordRectTransform = spawnedNewWord.GetComponent<RectTransform>();
 
             i++;
             nextCharacterTimer = 0;
-
-            justSpawnedRectTransform = spawnedNewWord.GetComponent<RectTransform>();
-
-            if (jumpToNextLine)
-            {
-                targetYPos = justSpawnedRectTransform.position.y;
-                jumpToNextLine = false;
-            }
-
-            firstWordMustSpawn = false;
         }
 	}
     
