@@ -32,6 +32,9 @@ public class Dialogue : MonoBehaviour {
 
     bool firstWordMustSpawn = true;
 
+    public bool displayNewDialogueLine = false;
+    public float bubbleMaximumWidth = 10f;
+
     public Canvas canvas;
     GameObject canvasObject;
 
@@ -72,9 +75,30 @@ public class Dialogue : MonoBehaviour {
             currentWordScript.previousWord = previousWordRectTransform;
         }
     }
+
+    void ResetDialogueBubble ()
+    {
+        GameObject[] everySingleWord = GameObject.FindGameObjectsWithTag("DialogueWord");
+
+        foreach (GameObject word in everySingleWord)
+            GameObject.Destroy(word);
+
+        firstWordMustSpawn = true;
+        DisplayNewText(textToDisplay);
+        i = 0;
+
+        Debug.Log("Resetted dialogue box");
+    }
 	
 	// Update is called once per frame
 	void Update () {
+        //We have to reset this component if a new line must be displayed
+        if (displayNewDialogueLine)
+        {
+            ResetDialogueBubble();
+            displayNewDialogueLine = false;
+        }
+
 
        nextCharacterTimer += Time.deltaTime;
         if (nextCharacterTimer > displaySpeedRate && i < currentWordsToDisplay.Length)
