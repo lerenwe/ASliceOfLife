@@ -13,6 +13,7 @@ public class GameStateManager : MonoBehaviour {
 
     public static bool FadingIn;
     public static bool FadingOut;
+    public static bool InDialogue;
 
     public static Image FadeImage;
 

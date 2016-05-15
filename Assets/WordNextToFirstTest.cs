@@ -8,7 +8,7 @@ public class WordNextToFirstTest : MonoBehaviour {
     public RectTransform previousWord;
     public float targetYPos = 0;
     public bool firstWord = false;
-    public Dialogue parentDialogue;
+    public DialogueDisplayer parentDialogue;
 
     RectTransform mahRectTransform;
     public Vector3 startPos;
@@ -42,8 +42,8 @@ public class WordNextToFirstTest : MonoBehaviour {
                 Vector3[] corners = new Vector3[4];
                 parentDialogue.bubbleBackRectTransform.GetWorldCorners(corners);
 
-                targetxPos = corners[1].x + mahRectTransform.rect.width * parentDialogue.canvas.scaleFactor / 2 + parentDialogue.xMargin;
-                targetyPos = corners[1].y - mahRectTransform.rect.height * parentDialogue.canvas.scaleFactor / 2 - parentDialogue.yMargin;
+                targetxPos = corners[1].x + mahRectTransform.rect.width * parentDialogue.canvas.scaleFactor / 2 + parentDialogue.xMargin * parentDialogue.canvas.scaleFactor;
+                targetyPos = corners[1].y - mahRectTransform.rect.height * parentDialogue.canvas.scaleFactor / 2 - parentDialogue.yMargin * parentDialogue.canvas.scaleFactor;
 
             if (begin)
                 parentDialogue.firstWordFromPreviousLine = mahRectTransform;
@@ -64,41 +64,6 @@ public class WordNextToFirstTest : MonoBehaviour {
             begin = false;
         }
             secondUpdateCall = true;
-        /*
-                if (firstWord)
-                {
-                    Vector3[] corners = new Vector3[4];
-                    parentDialogue.bubbleBackRectTransform.GetWorldCorners(corners);
-                    Debug.Log(corners[0]);
-                    float firstWordXPos = corners[1].x + mahRectTransform.rect.width * canvas.scaleFactor / 2 + parentDialogue.xMargin;
-                    float firstWordYPos = corners[1].y - mahRectTransform.rect.height * canvas.scaleFactor / 2 - parentDialogue.yMargin;
-                    Vector2 targetPosForFirstWord = new Vector2(firstWordXPos, firstWordYPos);
-
-                    mahRectTransform.position = targetPosForFirstWord;
-                }
-
-
-                if (begin)
-                {
-                    startPos = mahRectTransform.position;
-
-                    if(!firstWord && previousWord != null) //If it's not the first word of this dialogue bubble
-                        mahRectTransform.position = new Vector3(mahRectTransform.position.x, mahRectTransform.position.y + 10, mahRectTransform.position.z);
-
-                    begin = false;
-                }
-
-                Vector3 velocityNow = Vector3.zero;
-
-                if (previousWord != null)
-                {
-                    Vector3 targetPos = new Vector3(previousWord.position.x, targetYPos, 0)
-                            + new Vector3(previousWord.rect.width * canvas.scaleFactor / 2 
-                            + gameObject.GetComponent<RectTransform>().rect.width * canvas.scaleFactor / 2, 0, 0);
-
-                    mahRectTransform.position = Vector3.SmoothDamp(mahRectTransform.position, targetPos, ref velocityNow, .08f);
-                }
-                */
     }
 
     bool IsLineOverflowingHorizontally(float targetXPos, float targetYPos)
@@ -141,12 +106,5 @@ public class WordNextToFirstTest : MonoBehaviour {
         brokeLineOnce = true;
 
         return new Vector2(targetXPos, targetYPos);
-
-        /*targetYPos = firstWordYPos - previousWordRectTransform.rect.height * spawnedNewWord.GetComponent<WordNextToFirstTest>().canvas.scaleFactor / 2 - spaceBetweenLines;
-
-spawnedNewWord.GetComponent<RectTransform>().position = new Vector3(firstWordXPos, targetYPos, 0);
-
-firstWordXPos = spawnedNewWord.GetComponent<RectTransform>().position.x;
-firstWordYPos = spawnedNewWord.GetComponent<RectTransform>().position.y;*/
     }
 }
