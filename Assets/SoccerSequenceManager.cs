@@ -60,8 +60,7 @@ public class SoccerSequenceManager : MonoBehaviour {
 
         if (soccerKidScript != null && soccerKidScript.onDestinationPoint)
         {
-            //Bon là faudra lancer le dialogue et tout freezer tant qu'il est pas fini, on peut peut être faire ça avec un yield... A voir !
-            thisDialogue.GetComponent<Dialogue>().dialogueTriggered = true;
+            thisDialogue.GetComponent<Dialogue>().TriggerDialogue();
             Debug.Log("TRIGGERED HOLY SHIT");
             ballDisappeared = false;
             soccerKidScript.moveTowardPlayer = false;

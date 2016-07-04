@@ -21,7 +21,7 @@ public class DialogueDisplayer : MonoBehaviour {
     float firstWordXPos;
     int i = 0;
     public RectTransform previousWordRectTransform;
-    Image bubbleBackImage;
+    public Image bubbleBackImage;
     public RectTransform bubbleBackRectTransform;
     public RectTransform firstWordFromPreviousLine;
 
@@ -33,6 +33,7 @@ public class DialogueDisplayer : MonoBehaviour {
     bool firstWordMustSpawn = true;
 
     public bool displayNewDialogueLine = false;
+    public bool displayerReady = false;
     public float bubbleMaximumWidth = 10f;
 
     public Canvas canvas;
@@ -40,6 +41,10 @@ public class DialogueDisplayer : MonoBehaviour {
 
     // Use this for initialization
     void Start ()
+    {
+    }
+
+    public void InitializeNow ()
     {
         bubbleBackImage = gameObject.GetComponentInChildren<Image>();
         bubbleBackRectTransform = bubbleBackImage.gameObject.GetComponent<RectTransform>();
@@ -49,6 +54,7 @@ public class DialogueDisplayer : MonoBehaviour {
         canvasObject = GameObject.Find("GameStateManager");
         canvas = canvasObject.GetComponent<Canvas>();
 
+        displayerReady = true;
     }
 
     GameObject SpawnWord ()
