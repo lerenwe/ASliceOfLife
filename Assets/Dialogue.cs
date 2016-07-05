@@ -12,6 +12,7 @@ public class Dialogue : MonoBehaviour {
     public int[] characterSpeaking;
     public GameObject[] dialogueCharacters;
     public bool dialogueClosed = false;
+    public bool[] flipSideForThisCharacter;
 
     int currentLineToDisplay = 0;
 
@@ -54,16 +55,37 @@ public class Dialogue : MonoBehaviour {
 
                 Debug.Log("TRIGGERED & " + dialogueDisplayer.bubbleBackImage.sprite.bounds.size.y);
                 //This is where we set up the position of the bubble according to the speaking character
-                dialogueDisplayer.bubbleBackRectTransform.position = new Vector3 (characterPosition.x - dialogueDisplayer.bubbleBackRectTransform.rect.width / 2, characterPosition.y + characterMaxBounds.y / 2 + dialogueDisplayer.bubbleBackRectTransform.rect.height / 2, characterPosition.z);
+                if(!flipSideForThisCharacter[characterSpeaking[currentLineToDisplay]])
+                    dialogueDisplayer.bubbleBackRectTransform.position = new Vector3 (characterPosition.x - dialogueDisplayer.bubbleBackRectTransform.rect.width / 2,
+                        characterPosition.y + characterMaxBounds.y / 2 + dialogueDisplayer.bubbleBackRectTransform.rect.height / 2,
+                        characterPosition.z);
+                else
+                    dialogueDisplayer.bubbleBackRectTransform.position = new Vector3(characterPosition.x + dialogueDisplayer.bubbleBackRectTransform.rect.width / 2, characterPosition.y + characterMaxBounds.y / 2 + dialogueDisplayer.bubbleBackRectTransform.rect.height / 2, characterPosition.z);
                 //FIX IT FELIX : A ce moment, dialogueDisplayer.bubbleBackImage est null. Trouve le moment d'initialisation dood.
 
                 Debug.DrawLine(Camera.main.ScreenToWorldPoint(Vector3.zero), Camera.main.ScreenToWorldPoint(new Vector3(dialogueDisplayer.bubbleBackRectTransform.rect.xMax, dialogueDisplayer.bubbleBackRectTransform.rect.yMax, 0)), Color.green);
                 Debug.Log("XMAX IS : " + dialogueDisplayer.bubbleBackRectTransform.transform.position.x + dialogueDisplayer.bubbleBackRectTransform.rect.size.x);
 
-                if (dialogueDisplayer.bubbleBackRectTransform.transform.position.x + dialogueDisplayer.bubbleBackRectTransform.rect.size.x + 10 /*This is a small margin for the screen*/ > Screen.width)
+                float checkUpRightHandCorner = dialogueDisplayer.bubbleBackRectTransform.transform.position.x + dialogueDisplayer.bubbleBackRectTransform.rect.size.x / 2 + 10 /*This is a small margin for the screen*/ ;
+                float checkLeftHandCorner = dialogueDisplayer.bubbleBackRectTransform.transform.position.x - dialogueDisplayer.bubbleBackRectTransform.rect.size.x / 2 - 10 /*This is a small margin for the screen*/ ;
+
+               
+
+                if (checkUpRightHandCorner > Screen.width)
                 {
-                    Debug.Log("Woops, I'm outta screen, lol");
+                    float xDiff = (dialogueDisplayer.bubbleBackRectTransform.transform.position.x + dialogueDisplayer.bubbleBackRectTransform.rect.size.x / 2) - Screen.width;
+                    Debug.Log("Outta screen on the right");
+                    dialogueDisplayer.bubbleBackRectTransform.position = new Vector2 (dialogueDisplayer.bubbleBackRectTransform.position.x - xDiff, dialogueDisplayer.bubbleBackRectTransform.position.y);
                 }
+                else if (checkLeftHandCorner < 0)
+                {
+                    float xDiff = Mathf.Abs(dialogueDisplayer.bubbleBackRectTransform.transform.position.x - dialogueDisplayer.bubbleBackRectTransform.rect.size.x / 2);
+                    Debug.Log("MAH BUBBLE POS IS " + dialogueDisplayer.bubbleBackRectTransform.transform.position);
+                    Debug.Log("Woops, I'm outta screen, lol on the left " + checkLeftHandCorner + " and screen widht is " + Screen.width);
+                    dialogueDisplayer.bubbleBackRectTransform.position = new Vector2(dialogueDisplayer.bubbleBackRectTransform.transform.position.x + xDiff, dialogueDisplayer.bubbleBackRectTransform.transform.position.y);        
+                }
+
+                Debug.Log("MAH BUBBLE POS IS " + dialogueDisplayer.bubbleBackRectTransform.transform.position);
 
                 dialogueDisplayer.textToDisplay = dialogueLines[currentLineToDisplay];
                 dialogueDisplayer.ResetDialogueBubble();
