@@ -51,17 +51,25 @@ public class Dialogue : MonoBehaviour {
                 Vector3 characterPosition = Camera.main.WorldToScreenPoint(dialogueCharacters[characterSpeaking[currentLineToDisplay]].transform.position);
                 Vector3 characterMaxBounds = Camera.main.WorldToScreenPoint(dialogueCharacters[characterSpeaking[currentLineToDisplay]].GetComponent<SpriteRenderer>().bounds.max);
 
-
+                GameObject bubblePoint = dialogueDisplayer.bubbleBackRectTransform.transform.FindChild("BubblePointer").gameObject;
+                RectTransform bubblePointRect = bubblePoint.GetComponent<RectTransform>();
 
                 Debug.Log("TRIGGERED & " + dialogueDisplayer.bubbleBackImage.sprite.bounds.size.y);
                 //This is where we set up the position of the bubble according to the speaking character
-                if(!flipSideForThisCharacter[characterSpeaking[currentLineToDisplay]])
-                    dialogueDisplayer.bubbleBackRectTransform.position = new Vector3 (characterPosition.x - dialogueDisplayer.bubbleBackRectTransform.rect.width / 2,
+                if (!flipSideForThisCharacter[characterSpeaking[currentLineToDisplay]])
+                {
+                    dialogueDisplayer.bubbleBackRectTransform.position = new Vector3(characterPosition.x - dialogueDisplayer.bubbleBackRectTransform.rect.width / 2,
                         characterPosition.y + characterMaxBounds.y / 2 + dialogueDisplayer.bubbleBackRectTransform.rect.height / 2,
                         characterPosition.z);
+                    
+                }
                 else
+                {
                     dialogueDisplayer.bubbleBackRectTransform.position = new Vector3(characterPosition.x + dialogueDisplayer.bubbleBackRectTransform.rect.width / 2, characterPosition.y + characterMaxBounds.y / 2 + dialogueDisplayer.bubbleBackRectTransform.rect.height / 2, characterPosition.z);
-                //FIX IT FELIX : A ce moment, dialogueDisplayer.bubbleBackImage est null. Trouve le moment d'initialisation dood.
+                    
+                }
+
+
 
                 Debug.DrawLine(Camera.main.ScreenToWorldPoint(Vector3.zero), Camera.main.ScreenToWorldPoint(new Vector3(dialogueDisplayer.bubbleBackRectTransform.rect.xMax, dialogueDisplayer.bubbleBackRectTransform.rect.yMax, 0)), Color.green);
                 Debug.Log("XMAX IS : " + dialogueDisplayer.bubbleBackRectTransform.transform.position.x + dialogueDisplayer.bubbleBackRectTransform.rect.size.x);
@@ -77,13 +85,23 @@ public class Dialogue : MonoBehaviour {
                     Debug.Log("Outta screen on the right");
                     dialogueDisplayer.bubbleBackRectTransform.position = new Vector2 (dialogueDisplayer.bubbleBackRectTransform.position.x - xDiff, dialogueDisplayer.bubbleBackRectTransform.position.y);
                 }
-                else if (checkLeftHandCorner < 0)
+                else if (checkLeftHandCorner < 0) //mais sinon pourquoi tu fais pas des clamp plutôt ? Hein ? CLAMPIN. è_é
                 {
                     float xDiff = Mathf.Abs(dialogueDisplayer.bubbleBackRectTransform.transform.position.x - dialogueDisplayer.bubbleBackRectTransform.rect.size.x / 2);
                     Debug.Log("MAH BUBBLE POS IS " + dialogueDisplayer.bubbleBackRectTransform.transform.position);
                     Debug.Log("Woops, I'm outta screen, lol on the left " + checkLeftHandCorner + " and screen widht is " + Screen.width);
                     dialogueDisplayer.bubbleBackRectTransform.position = new Vector2(dialogueDisplayer.bubbleBackRectTransform.transform.position.x + xDiff, dialogueDisplayer.bubbleBackRectTransform.transform.position.y);        
                 }
+
+                Vector3 bubblePointTargetPos = new Vector2(characterPosition.x, bubblePointRect.position.y);
+                bubblePointTargetPos.x = Mathf.Clamp(bubblePointTargetPos.x, dialogueDisplayer.bubbleBackRectTransform.position.x - dialogueDisplayer.bubbleBackRectTransform.rect.width / 2 + 50, dialogueDisplayer.bubbleBackRectTransform.position.x + dialogueDisplayer.bubbleBackRectTransform.rect.width / 2 - 50);
+                bubblePointRect.position = bubblePointTargetPos;
+
+                if (bubblePointRect.position.x < dialogueDisplayer.bubbleBackRectTransform.position.x)
+                    bubblePointRect.localScale = new Vector3(-0.1233374f, 0.1233374f, 0.1233374f);
+                else
+                    bubblePointRect.localScale = new Vector3(0.1233374f, 0.1233374f, 0.1233374f);
+
 
                 Debug.Log("MAH BUBBLE POS IS " + dialogueDisplayer.bubbleBackRectTransform.transform.position);
 
