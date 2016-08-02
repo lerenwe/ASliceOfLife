@@ -74,24 +74,33 @@ public class Dialogue : MonoBehaviour {
                 Debug.DrawLine(Camera.main.ScreenToWorldPoint(Vector3.zero), Camera.main.ScreenToWorldPoint(new Vector3(dialogueDisplayer.bubbleBackRectTransform.rect.xMax, dialogueDisplayer.bubbleBackRectTransform.rect.yMax, 0)), Color.green);
                 Debug.Log("XMAX IS : " + dialogueDisplayer.bubbleBackRectTransform.transform.position.x + dialogueDisplayer.bubbleBackRectTransform.rect.size.x);
 
-                float checkUpRightHandCorner = dialogueDisplayer.bubbleBackRectTransform.transform.position.x + dialogueDisplayer.bubbleBackRectTransform.rect.size.x / 2 + 10 /*This is a small margin for the screen*/ ;
-                float checkLeftHandCorner = dialogueDisplayer.bubbleBackRectTransform.transform.position.x - dialogueDisplayer.bubbleBackRectTransform.rect.size.x / 2 - 10 /*This is a small margin for the screen*/ ;
+                float checkUpRightHandCorner = dialogueDisplayer.bubbleBackRectTransform.transform.position.x + dialogueDisplayer.bubbleBackRectTransform.rect.size.x / 2 + Screen.width * 0.01f; /*This is a small margin for the screen*/ ;
+                float checkLeftHandCorner = dialogueDisplayer.bubbleBackRectTransform.transform.position.x - dialogueDisplayer.bubbleBackRectTransform.rect.size.x / 2 - Screen.width * 0.01f; /*This is a small margin for the screen*/ ;
 
                
 
                 if (checkUpRightHandCorner > Screen.width)
                 {
-                    float xDiff = (dialogueDisplayer.bubbleBackRectTransform.transform.position.x + dialogueDisplayer.bubbleBackRectTransform.rect.size.x / 2) - Screen.width;
-                    Debug.Log("Outta screen on the right");
-                    dialogueDisplayer.bubbleBackRectTransform.position = new Vector2 (dialogueDisplayer.bubbleBackRectTransform.position.x - xDiff, dialogueDisplayer.bubbleBackRectTransform.position.y);
+                    //float xDiff = (dialogueDisplayer.bubbleBackRectTransform.transform.position.x + dialogueDisplayer.bubbleBackRectTransform.rect.width / 2);
+                    float screenDiff = Mathf.Abs(dialogueDisplayer.bubbleBackRectTransform.transform.position.x - Screen.width);
+                    Debug.Log("Outta screen on the right & with pos = " +dialogueDisplayer.bubbleBackRectTransform.position.x + " & screen width = " + Screen.width);
+                    //dialogueDisplayer.bubbleBackRectTransform.position = new Vector2 (dialogueDisplayer.bubbleBackRectTransform.position.x /*- xDiff*/ - screenDiff - Screen.width * .01f, dialogueDisplayer.bubbleBackRectTransform.position.y);
+
+
                 }
                 else if (checkLeftHandCorner < 0) //mais sinon pourquoi tu fais pas des clamp plutôt ? Hein ? CLAMPIN. è_é
                 {
-                    float xDiff = Mathf.Abs(dialogueDisplayer.bubbleBackRectTransform.transform.position.x - dialogueDisplayer.bubbleBackRectTransform.rect.size.x / 2);
-                    Debug.Log("MAH BUBBLE POS IS " + dialogueDisplayer.bubbleBackRectTransform.transform.position);
-                    Debug.Log("Woops, I'm outta screen, lol on the left " + checkLeftHandCorner + " and screen widht is " + Screen.width);
-                    dialogueDisplayer.bubbleBackRectTransform.position = new Vector2(dialogueDisplayer.bubbleBackRectTransform.transform.position.x + xDiff, dialogueDisplayer.bubbleBackRectTransform.transform.position.y);        
+                    //float xDiff = Mathf.Abs(dialogueDisplayer.bubbleBackRectTransform.transform.position.x - dialogueDisplayer.bubbleBackRectTransform.rect.size.x / 2);
+                    //Debug.Log("MAH BUBBLE POS IS " + dialogueDisplayer.bubbleBackRectTransform.transform.position);
+                    //Debug.Log("Woops, I'm outta screen, lol on the left " + checkLeftHandCorner + " and screen widht is " + Screen.width);
+                    //dialogueDisplayer.bubbleBackRectTransform.position = new Vector2(dialogueDisplayer.bubbleBackRectTransform.transform.position.x + xDiff, dialogueDisplayer.bubbleBackRectTransform.transform.position.y);        
                 }
+
+                Vector3 bubbleTargetPos = new Vector2(dialogueDisplayer.bubbleBackRectTransform.position.x, dialogueDisplayer.bubbleBackRectTransform.position.y); 
+                bubbleTargetPos.x = Mathf.Clamp(bubbleTargetPos.x, -Screen.width, Screen.width); // PICK UP HERE!!!
+                Debug.Log("bubbleTargetPos.x = " + bubbleTargetPos);
+                dialogueDisplayer.bubbleBackRectTransform.position = bubbleTargetPos;
+                Debug.Log ("Final Bubble Pos is " + dialogueDisplayer.bubbleBackRectTransform.position.x);
 
                 Vector3 bubblePointTargetPos = new Vector2(characterPosition.x, bubblePointRect.position.y);
                 bubblePointTargetPos.x = Mathf.Clamp(bubblePointTargetPos.x, dialogueDisplayer.bubbleBackRectTransform.position.x - dialogueDisplayer.bubbleBackRectTransform.rect.width / 2 + 50, dialogueDisplayer.bubbleBackRectTransform.position.x + dialogueDisplayer.bubbleBackRectTransform.rect.width / 2 - 50);
