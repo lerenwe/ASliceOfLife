@@ -5,6 +5,8 @@ using UnityEngine.UI;
 
 public class Dialogue : MonoBehaviour {
 
+    public Canvas thisCanvas;
+
     public List<DialogueCharacter> characters;
     public bool dialogueTriggered = false;
     public bool dialogueInProgress = false;
@@ -13,6 +15,7 @@ public class Dialogue : MonoBehaviour {
     public GameObject[] dialogueCharacters;
     public bool dialogueClosed = false;
     public bool[] flipSideForThisCharacter;
+    public float screenMarginPercentage = .1f;
 
     int currentLineToDisplay = 0;
 
@@ -96,9 +99,17 @@ public class Dialogue : MonoBehaviour {
                     //dialogueDisplayer.bubbleBackRectTransform.position = new Vector2(dialogueDisplayer.bubbleBackRectTransform.transform.position.x + xDiff, dialogueDisplayer.bubbleBackRectTransform.transform.position.y);        
                 }
 
+                Vector3 UpRightHandWorldSpace = Camera.main.ScreenToWorldPoint(new Vector3(checkUpRightHandCorner, 0));
+                Vector3 LeftHandCornerWorldSpace = Camera.main.ScreenToWorldPoint(new Vector3(checkLeftHandCorner, 0));
+                float bubbleSizeInWorldSpace = LeftHandCornerWorldSpace.x - UpRightHandWorldSpace.x;
+
+                Debug.Log("Bubble size = " + bubbleSizeInWorldSpace + " compared to internal width " + dialogueDisplayer.bubbleBackRectTransform.rect.width);
+
+                float xMarginForBubble = Screen.width * screenMarginPercentage;
                 Vector3 bubbleTargetPos = new Vector2(dialogueDisplayer.bubbleBackRectTransform.position.x, dialogueDisplayer.bubbleBackRectTransform.position.y); 
-                bubbleTargetPos.x = Mathf.Clamp(bubbleTargetPos.x, -Screen.width, Screen.width); // PICK UP HERE!!!
-                Debug.Log("bubbleTargetPos.x = " + bubbleTargetPos);
+                bubbleTargetPos.x = Mathf.Clamp(bubbleTargetPos.x, xMarginForBubble + dialogueDisplayer.bubbleBackRectTransform.rect.size.x * thisCanvas.scaleFactor / 2, Screen.width - xMarginForBubble - dialogueDisplayer.bubbleBackRectTransform.rect.size.x * thisCanvas.scaleFactor / 2); // PICK UP HERE!!!
+                Debug.Log("bubbleTargetPos.x = " + bubbleTargetPos.x);
+
                 dialogueDisplayer.bubbleBackRectTransform.position = bubbleTargetPos;
                 Debug.Log ("Final Bubble Pos is " + dialogueDisplayer.bubbleBackRectTransform.position.x);
 
