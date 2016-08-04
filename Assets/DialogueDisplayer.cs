@@ -24,6 +24,7 @@ public class DialogueDisplayer : MonoBehaviour {
     public Image bubbleBackImage;
     public RectTransform bubbleBackRectTransform;
     public RectTransform firstWordFromPreviousLine;
+    public bool m_bReachedLineEnd = false;
 
     bool jumpToNextLine = true;
     float targetYPos;
@@ -38,6 +39,8 @@ public class DialogueDisplayer : MonoBehaviour {
 
     public Canvas canvas;
     GameObject canvasObject;
+
+    public GameObject NextLineLogo;
 
     // Use this for initialization
     void Start ()
@@ -93,6 +96,8 @@ public class DialogueDisplayer : MonoBehaviour {
         DisplayNewText(textToDisplay);
         i = 0;
 
+        NextLineLogo.SetActive(false);
+
         Debug.Log("Resetted dialogue box");
     }
 	
@@ -117,6 +122,12 @@ public class DialogueDisplayer : MonoBehaviour {
 
             i++;
             nextCharacterTimer = 0;
+        }
+
+        if (i >= currentWordsToDisplay.Length)
+        {
+            Debug.Log("Reached line end !");
+            NextLineLogo.SetActive(true);
         }
 	}
     

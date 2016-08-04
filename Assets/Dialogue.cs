@@ -60,25 +60,6 @@ public class Dialogue : MonoBehaviour {
                 float characterHeight = Mathf.Abs (characterMaxBounds.y - characterPosition.y);
                 float characterWidth = Mathf.Abs(characterMaxBounds.x - characterPosition.x);
 
-                //get world space size (this version operates on the bounds of the object, so expands when rotating)
-                //Vector3 world_size = GetComponent<SpriteRenderer>().bounds.size;
-
-                //get world space size (this version handles rotating correctly)
-                Vector2 sprite_size = dialogueCharacters[characterSpeaking[currentLineToDisplay]].GetComponent<SpriteRenderer>().sprite.rect.size;
-                Vector2 local_sprite_size = sprite_size / dialogueCharacters[characterSpeaking[currentLineToDisplay]].GetComponent<SpriteRenderer>().sprite.pixelsPerUnit;
-                Vector3 world_size = local_sprite_size;
-                world_size.x *= transform.lossyScale.x;
-                world_size.y *= transform.lossyScale.y;
-
-                //convert to screen space size
-                Vector3 screen_size = 0.5f * world_size / Camera.main.orthographicSize;
-                screen_size.y *= Camera.main.aspect;
-
-                //size in pixels
-                Vector3 in_pixels = new Vector3(screen_size.x * Camera.main.pixelWidth, screen_size.y * Camera.main.pixelHeight, 0) * 0.5f;
-
-                Debug.Log("Scale factor = " + thisCanvas.scaleFactor);
-
                 GameObject bubblePoint = dialogueDisplayer.bubbleBackRectTransform.transform.FindChild("BubblePointer").gameObject;
                 RectTransform bubblePointRect = bubblePoint.GetComponent<RectTransform>();
 
@@ -152,5 +133,5 @@ public class Dialogue : MonoBehaviour {
                 dialogueClosed = true;
             }
         }
-	}
+    }
 }
