@@ -56,29 +56,52 @@ public class Dialogue : MonoBehaviour {
                 //The character's position is actually its upper sprite bound.
                 Vector3 characterPosition = Camera.main.WorldToScreenPoint(dialogueCharacters[characterSpeaking[currentLineToDisplay]].transform.position);
                 Vector3 characterMaxBounds = Camera.main.WorldToScreenPoint(dialogueCharacters[characterSpeaking[currentLineToDisplay]].GetComponent<SpriteRenderer>().bounds.max);
+                Debug.Log("characterMaxBounds = " + characterMaxBounds);
                 float characterHeight = Mathf.Abs (characterMaxBounds.y - characterPosition.y);
                 float characterWidth = Mathf.Abs(characterMaxBounds.x - characterPosition.x);
+
+                //get world space size (this version operates on the bounds of the object, so expands when rotating)
+                //Vector3 world_size = GetComponent<SpriteRenderer>().bounds.size;
+
+                //get world space size (this version handles rotating correctly)
+                Vector2 sprite_size = dialogueCharacters[characterSpeaking[currentLineToDisplay]].GetComponent<SpriteRenderer>().sprite.rect.size;
+                Vector2 local_sprite_size = sprite_size / dialogueCharacters[characterSpeaking[currentLineToDisplay]].GetComponent<SpriteRenderer>().sprite.pixelsPerUnit;
+                Vector3 world_size = local_sprite_size;
+                world_size.x *= transform.lossyScale.x;
+                world_size.y *= transform.lossyScale.y;
+
+                //convert to screen space size
+                Vector3 screen_size = 0.5f * world_size / Camera.main.orthographicSize;
+                screen_size.y *= Camera.main.aspect;
+
+                //size in pixels
+                Vector3 in_pixels = new Vector3(screen_size.x * Camera.main.pixelWidth, screen_size.y * Camera.main.pixelHeight, 0) * 0.5f;
+
+                Debug.Log("Scale factor = " + thisCanvas.scaleFactor);
 
                 GameObject bubblePoint = dialogueDisplayer.bubbleBackRectTransform.transform.FindChild("BubblePointer").gameObject;
                 RectTransform bubblePointRect = bubblePoint.GetComponent<RectTransform>();
 
+                Vector3 bubbleTargetPos;
+
                 //This is where we set up the position of the bubble according to the speaking character
                 if (!flipSideForThisCharacter[characterSpeaking[currentLineToDisplay]])
                 {
-                    dialogueDisplayer.bubbleBackRectTransform.position = new Vector3(characterPosition.x - dialogueDisplayer.bubbleBackRectTransform.rect.width / 2,
-                        characterPosition.y + characterHeight + Screen.height * .05f + dialogueDisplayer.bubbleBackRectTransform.rect.height / 2,
+                    bubbleTargetPos = new Vector3(characterPosition.x - dialogueDisplayer.bubbleBackRectTransform.rect.width / 2,
+                        characterMaxBounds.y,
                         characterPosition.z);
                 }
                 else
                 {
-                    dialogueDisplayer.bubbleBackRectTransform.position = new Vector3(characterPosition.x + dialogueDisplayer.bubbleBackRectTransform.rect.width / 2,
-                        characterPosition.y + characterHeight + Screen.height * .05f + (dialogueDisplayer.bubbleBackRectTransform.rect.height / 2),
+                    bubbleTargetPos = new Vector3(characterPosition.x + dialogueDisplayer.bubbleBackRectTransform.rect.width / 2,
+                        characterMaxBounds.y,
                         characterPosition.z);
                 }
 
+                bubbleTargetPos.y += dialogueDisplayer.bubbleBackRectTransform.rect.size.y / 2 * thisCanvas.scaleFactor;
+
                 //Then, let's prevent the bubble for getting out of the screen if the character is too close to one of the vertical borders of the screen
                 float xMarginForBubble = Screen.width * screenMarginPercentage;
-                Vector3 bubbleTargetPos = new Vector2(dialogueDisplayer.bubbleBackRectTransform.position.x, dialogueDisplayer.bubbleBackRectTransform.position.y);
                 bubbleTargetPos.x = Mathf.Clamp(bubbleTargetPos.x, xMarginForBubble + dialogueDisplayer.bubbleBackRectTransform.rect.size.x * thisCanvas.scaleFactor / 2, Screen.width - xMarginForBubble - dialogueDisplayer.bubbleBackRectTransform.rect.size.x * thisCanvas.scaleFactor / 2);
                 dialogueDisplayer.bubbleBackRectTransform.position = bubbleTargetPos;
                 Debug.Log("Final Bubble Pos is " + dialogueDisplayer.bubbleBackRectTransform.position.x);
