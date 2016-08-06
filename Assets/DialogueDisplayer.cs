@@ -2,6 +2,7 @@
 using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
+using Ink.Runtime;
 
 public class DialogueDisplayer : MonoBehaviour {
 
@@ -67,7 +68,7 @@ public class DialogueDisplayer : MonoBehaviour {
 
     GameObject SpawnWord ()
     {
-        GameObject spawnedWord = Object.Instantiate(wordPrefab) as GameObject;
+        GameObject spawnedWord = GameObject.Instantiate(wordPrefab) as GameObject;
         Text newWordText = spawnedWord.GetComponent<Text>();
         newWordText.text += currentWordsToDisplay[i];
         newWordText.color = textColor;

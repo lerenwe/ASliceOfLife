@@ -2,8 +2,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
+using Ink.Runtime;
 
 public class Dialogue : MonoBehaviour {
+
+    [SerializeField]
+    private TextAsset inkJSONAsset;
+    private Story story;
 
     public Canvas thisCanvas;
 
@@ -33,6 +38,7 @@ public class Dialogue : MonoBehaviour {
 	
     public void TriggerDialogue ()
     {
+        story = new Story(inkJSONAsset.text);
         dialogueTriggered = true;
         dialogueStarted = true;
     }
