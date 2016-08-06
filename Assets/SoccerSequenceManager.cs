@@ -61,7 +61,7 @@ public class SoccerSequenceManager : MonoBehaviour {
         if (soccerKidScript != null && soccerKidScript.onDestinationPoint)
         {
             thisDialogue.GetComponent<Dialogue>().TriggerDialogue();
-            Debug.Log("TRIGGERED HOLY SHIT");
+            //Debug.Log("TRIGGERED HOLY SHIT");
             ballDisappeared = false;
             soccerKidScript.moveTowardPlayer = false;
             waitingForDialogueEnd = true;

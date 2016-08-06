@@ -25,6 +25,8 @@ public class DialogueDisplayer : MonoBehaviour {
     public RectTransform bubbleBackRectTransform;
     public RectTransform firstWordFromPreviousLine;
     public bool m_bReachedLineEnd = false;
+    public float screenMarginPercentage = .1f;
+    public bool finishedLine = false;
 
     bool jumpToNextLine = true;
     float targetYPos;
@@ -41,6 +43,9 @@ public class DialogueDisplayer : MonoBehaviour {
     GameObject canvasObject;
 
     public GameObject NextLineLogo;
+
+    [HideInInspector]
+    public bool skipThisLine = false;
 
     // Use this for initialization
     void Start ()
@@ -96,18 +101,29 @@ public class DialogueDisplayer : MonoBehaviour {
         DisplayNewText(textToDisplay);
         i = 0;
 
+        finishedLine = false;
         NextLineLogo.SetActive(false);
 
-        Debug.Log("Resetted dialogue box");
+        //Debug.Log("Resetted dialogue box");
     }
-	
+
 	// Update is called once per frame
 	void Update () {
+
         //We have to reset this component if a new line must be displayed
         if (displayNewDialogueLine)
         {
             ResetDialogueBubble();
             displayNewDialogueLine = false;
+        }
+
+        if (skipThisLine && !finishedLine)
+        {
+            nextCharacterTimer = displaySpeedRate + 1;
+        }
+        else if (skipThisLine && finishedLine)
+        {
+            skipThisLine = false;
         }
 
 
@@ -126,7 +142,8 @@ public class DialogueDisplayer : MonoBehaviour {
 
         if (i >= currentWordsToDisplay.Length)
         {
-            Debug.Log("Reached line end !");
+            //Debug.Log("Reached line end !");
+            finishedLine = true;
             NextLineLogo.SetActive(true);
         }
 	}

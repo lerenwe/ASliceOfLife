@@ -74,7 +74,7 @@ public class WordNextToFirstTest : MonoBehaviour {
 
         if (currentWordXBoundary > currentBubbleXBoundary)
         {
-            Debug.Log("CLEARLY, YOU HAVE CROSSED THE LINE, BITCH");
+            //Debug.Log("CLEARLY, YOU HAVE CROSSED THE LINE, BITCH");
             return true;
 
         }
@@ -94,7 +94,7 @@ public class WordNextToFirstTest : MonoBehaviour {
             targetXPos = corners[1].x + mahRectTransform.rect.width * parentDialogue.canvas.scaleFactor / 2 + parentDialogue.xMargin;
             targetYPos = parentDialogue.firstWordFromPreviousLine.position.y - mahRectTransform.rect.height * parentDialogue.canvas.scaleFactor - parentDialogue.spaceBetweenLines;
 
-            Debug.Log(this.name + " Line broke");
+            //Debug.Log(this.name + " Line broke");
         }
         else
         {
