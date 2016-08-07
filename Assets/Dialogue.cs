@@ -69,9 +69,6 @@ public class Dialogue : MonoBehaviour {
                     dialogueDisplayer = dialogueDisplayObject.GetComponent<DialogueDisplayer>();
             }
 
-            //Parsing who's speaking right now
-
-
             //All of this stuff is to place the bubble correctly
             if (dialogueInProgress)
             {
@@ -87,8 +84,22 @@ public class Dialogue : MonoBehaviour {
 
                 Vector3 bubbleTargetPos;
 
+                int speakingCharacterNumber = 0;
+
+                foreach (GameObject character in dialogueCharacters)
+                {
+                    if (character == characterSpeaking)
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        speakingCharacterNumber++;
+                    }
+                }
+
                 //This is where we set up the position of the bubble according to the speaking character
-                if (!flipSideForThisCharacter[0])
+                if (!flipSideForThisCharacter[speakingCharacterNumber])
                 {
                     bubbleTargetPos = new Vector3(characterPosition.x - dialogueDisplayer.bubbleBackRectTransform.rect.width / 2,
                         characterMaxBounds.y,
@@ -143,19 +154,20 @@ public class Dialogue : MonoBehaviour {
                     //Then we finally display the text on top of all that
                     string text = story.Continue().Trim(); // EXPERIMENTAL INK
 
-                    //dialogueDisplayer.textToDisplay = dialogueLines[currentLineToDisplay];
-                    dialogueDisplayer.textToDisplay = text; // EXPERIMENTAL INK
-
+                    //Parsing who's speaking right now
                     string firstWord = text.Split(':').First();
 
                     foreach (GameObject character in dialogueCharacters)
                     {
-                        if (firstWord.Equals(character.transform.name)) 
+                        if (firstWord.Equals(character.transform.name))
                         {
                             characterSpeaking = character;
                             break;
                         }
                     }
+
+                    //dialogueDisplayer.textToDisplay = dialogueLines[currentLineToDisplay];
+                    dialogueDisplayer.textToDisplay = text.Replace(characterSpeaking.transform.name + ":", ""); // EXPERIMENTAL INK
 
                     dialogueDisplayer.ResetDialogueBubble();
                     dialogueTriggered = false;
