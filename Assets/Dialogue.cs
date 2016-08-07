@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
+using System.Linq;
 using Ink.Runtime;
 
 public class Dialogue : MonoBehaviour {
@@ -12,17 +13,18 @@ public class Dialogue : MonoBehaviour {
 
     public Canvas thisCanvas;
 
-    public List<DialogueCharacter> characters;
     public bool dialogueTriggered = false;
     public bool dialogueInProgress = false;
     public string[] dialogueLines;
-    public int[] characterSpeaking;
+    public GameObject characterSpeaking;
     public GameObject[] dialogueCharacters;
+    string[] charactersName;
     public bool dialogueClosed = false;
     public bool[] flipSideForThisCharacter;
 
     bool reachedDialogueEnd = false;
     bool dialogueStarted = false;
+    bool lastLine = false;
 
     int currentLineToDisplay = 0;
 
@@ -32,13 +34,21 @@ public class Dialogue : MonoBehaviour {
 	// Use this for initialization
 	void Start ()
     {
-        if (dialogueLines.Length != characterSpeaking.Length)
-            Debug.LogError("THE NUMBER OF DIALOGUE LINES DOES NOT MATCH THE NUMBER OF CHARACTER SPEAKING");
 	}
 	
     public void TriggerDialogue ()
     {
         story = new Story(inkJSONAsset.text);
+
+
+        charactersName = new string[dialogueCharacters.Length];
+        int iterator = 0;
+        foreach (GameObject character in dialogueCharacters)
+        {
+            charactersName[iterator] = character.transform.name;
+            iterator++;
+        }
+
         dialogueTriggered = true;
         dialogueStarted = true;
     }
@@ -48,7 +58,7 @@ public class Dialogue : MonoBehaviour {
     {
         if (!dialogueClosed)
         {
-            if (dialogueTriggered || (dialogueInProgress && Input.GetKeyDown("space"))) //Display the first line
+            if (dialogueTriggered || (dialogueInProgress && !lastLine && Input.GetKeyDown("space"))) //Display the first line
             {
                 dialogueDisplayer = dialogueDisplayObject.GetComponent<DialogueDisplayer>();
                 dialogueDisplayObject.SetActive(true);
@@ -59,12 +69,15 @@ public class Dialogue : MonoBehaviour {
                     dialogueDisplayer = dialogueDisplayObject.GetComponent<DialogueDisplayer>();
             }
 
+            //Parsing who's speaking right now
+
+
             //All of this stuff is to place the bubble correctly
             if (dialogueInProgress)
             {
                 //The character's position is actually its upper sprite bound.
-                Vector3 characterPosition = Camera.main.WorldToScreenPoint(dialogueCharacters[characterSpeaking[currentLineToDisplay]].transform.position);
-                Vector3 characterMaxBounds = Camera.main.WorldToScreenPoint(dialogueCharacters[characterSpeaking[currentLineToDisplay]].GetComponent<SpriteRenderer>().bounds.max);
+                Vector3 characterPosition = Camera.main.WorldToScreenPoint(characterSpeaking.transform.position);
+                Vector3 characterMaxBounds = Camera.main.WorldToScreenPoint(characterSpeaking.GetComponent<SpriteRenderer>().bounds.max);
                 //Debug.Log("characterMaxBounds = " + characterMaxBounds);
                 float characterHeight = Mathf.Abs (characterMaxBounds.y - characterPosition.y);
                 float characterWidth = Mathf.Abs(characterMaxBounds.x - characterPosition.x);
@@ -75,7 +88,7 @@ public class Dialogue : MonoBehaviour {
                 Vector3 bubbleTargetPos;
 
                 //This is where we set up the position of the bubble according to the speaking character
-                if (!flipSideForThisCharacter[characterSpeaking[currentLineToDisplay]])
+                if (!flipSideForThisCharacter[0])
                 {
                     bubbleTargetPos = new Vector3(characterPosition.x - dialogueDisplayer.bubbleBackRectTransform.rect.width / 2,
                         characterMaxBounds.y,
@@ -125,26 +138,48 @@ public class Dialogue : MonoBehaviour {
                     Debug.Log("Skipped dialogue line");
                     dialogueDisplayer.skipThisLine = true;
                 }
-                else if (dialogueTriggered || (dialogueInProgress && Input.GetKeyDown("space") && dialogueDisplayer.finishedLine)) //Display the next line
+                else if (dialogueTriggered || (dialogueInProgress && !lastLine && Input.GetKeyDown("space") && dialogueDisplayer.finishedLine)) //Display the next line
                 {
                     //Then we finally display the text on top of all that
-                    dialogueDisplayer.textToDisplay = dialogueLines[currentLineToDisplay];
+                    string text = story.Continue().Trim(); // EXPERIMENTAL INK
+
+                    //dialogueDisplayer.textToDisplay = dialogueLines[currentLineToDisplay];
+                    dialogueDisplayer.textToDisplay = text; // EXPERIMENTAL INK
+
+                    string firstWord = text.Split(':').First();
+
+                    foreach (GameObject character in dialogueCharacters)
+                    {
+                        if (firstWord.Equals(character.transform.name)) 
+                        {
+                            characterSpeaking = character;
+                            break;
+                        }
+                    }
+
                     dialogueDisplayer.ResetDialogueBubble();
                     dialogueTriggered = false;
                     dialogueInProgress = true;
 
 
-                    if (currentLineToDisplay < dialogueLines.Length - 1)
+                    /*if (currentLineToDisplay < dialogueLines.Length - 1)
                         currentLineToDisplay++;
                     else
                     {
                         dialogueInProgress = false;
                         Debug.Log("Dialogue is over");
+                    }*/
+
+                    if(!story.canContinue)
+                    {
+                        lastLine = true;
+                        Debug.Log("Dialogue is over");
                     }
                 }
-                else if (dialogueStarted && !dialogueInProgress && Input.GetKeyDown("space") && dialogueDisplayer.finishedLine) //Close dialogue 
+                else if (dialogueStarted && lastLine && Input.GetKeyDown("space") && dialogueDisplayer.finishedLine) //Close dialogue 
                 {
                     Debug.Log("End of Dialogue");
+                    dialogueInProgress = false;
                     dialogueDisplayObject.SetActive(false);
                     dialogueClosed = true;
                 }

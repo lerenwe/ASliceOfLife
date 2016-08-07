@@ -102,6 +102,8 @@ public class WordNextToFirstTest : MonoBehaviour {
             targetYPos = mahRectTransform.position.y;
         }
 
+
+        transform.SetParent(parentDialogue.bubbleBackRectTransform.transform);
         parentDialogue.firstWordFromPreviousLine = mahRectTransform;
         brokeLineOnce = true;
 
