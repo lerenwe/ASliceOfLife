@@ -56,7 +56,14 @@ public class WordNextToFirstTest : MonoBehaviour {
 
             Vector2 targetStartPos = new Vector2(targetxPos, targetyPos);
 
-            startPos = IsLineOverflowingHorizontally(targetxPos, targetyPos) ? BreakLine() : targetStartPos;
+            if (IsLineOverflowingHorizontally(targetxPos, targetyPos))
+            {
+                transform.SetParent(parentDialogue.bubbleBackRectTransform.transform);
+                startPos = BreakLine();
+            }
+            else
+                startPos = targetStartPos;
+            //startPos = IsLineOverflowingHorizontally(targetxPos, targetyPos) ? BreakLine() : targetStartPos;
             #endregion
 
             mahRectTransform.position = startPos;
@@ -91,8 +98,8 @@ public class WordNextToFirstTest : MonoBehaviour {
             Vector3[] corners = new Vector3[4];
             parentDialogue.bubbleBackRectTransform.GetWorldCorners(corners);
 
-            targetXPos = corners[1].x + mahRectTransform.rect.width * parentDialogue.canvas.scaleFactor / 2 + parentDialogue.xMargin;
-            targetYPos = parentDialogue.firstWordFromPreviousLine.position.y - mahRectTransform.rect.height * parentDialogue.canvas.scaleFactor - parentDialogue.spaceBetweenLines;
+            targetXPos = parentDialogue.firstWordFromPreviousLine.position.x - (parentDialogue.firstWordFromPreviousLine.rect.width / 2) * parentDialogue.canvas.scaleFactor + (mahRectTransform.rect.width / 2) * parentDialogue.canvas.scaleFactor;
+            targetYPos = parentDialogue.firstWordFromPreviousLine.position.y - (mahRectTransform.rect.height / 2) * parentDialogue.canvas.scaleFactor - parentDialogue.spaceBetweenLines * parentDialogue.canvas.scaleFactor;
 
             //Debug.Log(this.name + " Line broke");
         }
@@ -103,7 +110,7 @@ public class WordNextToFirstTest : MonoBehaviour {
         }
 
 
-        transform.SetParent(parentDialogue.bubbleBackRectTransform.transform);
+        
         parentDialogue.firstWordFromPreviousLine = mahRectTransform;
         brokeLineOnce = true;
 

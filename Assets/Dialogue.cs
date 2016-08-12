@@ -167,7 +167,8 @@ public class Dialogue : MonoBehaviour {
                     }
 
                     //dialogueDisplayer.textToDisplay = dialogueLines[currentLineToDisplay];
-                    dialogueDisplayer.textToDisplay = text.Replace(characterSpeaking.transform.name + ":", ""); // EXPERIMENTAL INK
+                    text = text.Replace(characterSpeaking.transform.name + ":", "");
+                    dialogueDisplayer.textToDisplay = text.Trim(); // EXPERIMENTAL INK
 
                     dialogueDisplayer.ResetDialogueBubble();
                     dialogueTriggered = false;

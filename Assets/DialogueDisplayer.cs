@@ -134,7 +134,7 @@ public class DialogueDisplayer : MonoBehaviour {
             GameObject spawnedNewWord = SpawnWord();
             setWordStartPos(firstWordMustSpawn, spawnedNewWord);
             firstWordMustSpawn = false;
-            spawnedNewWord.transform.SetParent(this.transform);
+            spawnedNewWord.transform.SetParent(bubbleBackRectTransform.transform);
             previousWordRectTransform = spawnedNewWord.GetComponent<RectTransform>();
 
             i++;
