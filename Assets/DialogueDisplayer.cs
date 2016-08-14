@@ -6,91 +6,108 @@ using Ink.Runtime;
 
 public class DialogueDisplayer : MonoBehaviour {
 
-    public string textToDisplay = "lol";
-    public GameObject wordPrefab;
-    public GameObject mainCanvas;
-    string displayedText = null;
-    char[] currentCharsToDisplay;
-    string[] currentWordsToDisplay;
-    float nextCharacterTimer;
-    public float displaySpeedRate = 1f;
-    public float spaceBetweenLines = .2f;
-    public float xMargin = 0;
-    public float yMargin = 0;
-    public Color textColor = Color.white;
-    float firstWordYPos;
-    float firstWordXPos;
-    int i = 0;
-    public RectTransform previousWordRectTransform;
-    public Image bubbleBackImage;
-    public RectTransform bubbleBackRectTransform;
-    public RectTransform firstWordFromPreviousLine;
-    public bool m_bReachedLineEnd = false;
-    public float screenMarginPercentage = .1f;
-    public bool finishedLine = false;
 
-    bool jumpToNextLine = true;
-    float targetYPos;
+    #region Display Internal Variables
+        [HideInInspector] public string textToDisplay = "TEXT DISPLAY ERROR";
+        [HideInInspector] public bool skipThisLine = false;
 
-    Text textComponent;
+        string displayedText = null;
+        string[] currentWordsToDisplay;
 
-    bool firstWordMustSpawn = true;
+        //Positioning & Line status
+        [HideInInspector] public RectTransform previousWordRectTransform;
+        [HideInInspector] public RectTransform bubbleBackRectTransform;
+        [HideInInspector] public RectTransform firstWordFromPreviousLine;
+        [HideInInspector] public Image bubbleBackImage;
 
-    public bool displayNewDialogueLine = false;
-    public bool displayerReady = false;
-    public float bubbleMaximumWidth = 10f;
+        [HideInInspector] public bool m_bReachedLineEnd = false;
+        [HideInInspector] public bool finishedLine = false;
+        bool firstWordMustSpawn = true;
 
-    public Canvas canvas;
-    GameObject canvasObject;
+        float targetYPos;
+    #endregion
 
-    public GameObject NextLineLogo;
+    #region External Components
+        [HideInInspector] public Canvas canvas;
+        GameObject NextLineLogo;
+    #endregion
 
-    [HideInInspector]
-    public bool skipThisLine = false;
+    #region Inspector Variables
+        [Header("Required prefabs")]
+        public GameObject wordPrefab;
+
+
+        [Space(10)]
+        [Header("Display customization")]
+        public float displaySpeedRate = 1f;
+
+        [Space(5)]
+        public float xMargin = 0;
+        public float yMargin = 0;
+
+        [Space(5)]
+        [Range(0, 1)]
+        [Tooltip("Avoid the bubbles to get out of the screen, by adding a margin. Number represents percentage of the screen's X size.")]
+        public float screenMarginPercentage = .1f;
+        public float spaceBetweenLines = .2f;
+
+        [Space(5)]
+        public Color textColor = Color.white;
+    #endregion
+
+    #region Misc
+        int iterator = 0;
+        float nextCharacterTimer;
+    #endregion
 
     // Use this for initialization
     void Start ()
     {
-    }
-
-    public void InitializeNow ()
-    {
+        //Getting external components and objects
+        canvas = GameObject.Find("GameStateManager").GetComponent<Canvas>();
+        NextLineLogo = GameObject.Find("ContinueSpeechLogo").gameObject;
         bubbleBackImage = gameObject.GetComponentInChildren<Image>();
         bubbleBackRectTransform = bubbleBackImage.gameObject.GetComponent<RectTransform>();
-        textComponent = this.GetComponent<Text>();
-        DisplayNewText(textToDisplay);
 
-        canvasObject = GameObject.Find("GameStateManager");
-        canvas = canvasObject.GetComponent<Canvas>();
-
-        displayerReady = true;
+        //At game start, we want to hide the bubbles
+        NextLineLogo.SetActive(false);
+        gameObject.SetActive(false);
     }
 
+    //Spawn a word and return the created gameObject
     GameObject SpawnWord ()
     {
         GameObject spawnedWord = GameObject.Instantiate(wordPrefab) as GameObject;
         Text newWordText = spawnedWord.GetComponent<Text>();
-        newWordText.text += currentWordsToDisplay[i];
+        newWordText.text += currentWordsToDisplay[iterator];
+
         newWordText.color = textColor;
-        spawnedWord.transform.name = currentWordsToDisplay[i];
+
+        spawnedWord.transform.name = currentWordsToDisplay[iterator];
         newWordText.text += " ";
+
         return spawnedWord;
     }
 
+    //Set the word initial position right after being spawned
+    //This also parents the word to the dialogueDisplayer, so we make sure it'll follow the bubble dynamically
     void setWordStartPos (bool isFirstWord, GameObject currentWord)
     {
         WordNextToFirstTest currentWordScript = currentWord.GetComponent<WordNextToFirstTest>();
         currentWordScript.parentDialogue = this;
 
-        if (isFirstWord)
+        if (isFirstWord) //We have to mark the word if it is the first one to spawn for this line, as its position will drive the rest of the words' positions.
             currentWordScript.firstWord = true;
         else
         {
             currentWordScript.firstWord = false;
-            currentWordScript.previousWord = previousWordRectTransform;
+            currentWordScript.previousWord = previousWordRectTransform; //This will be useful as every word that spawns after the first one will use the previously spawned word
+                                                                        //position in order to place itself.
         }
     }
 
+    //Must be called each time we need to clear the bubble (Most of the time, it's to prepare the next line to be displayed).
+    //This will also immediately start to display the next line of dialogue.
     public void ResetDialogueBubble ()
     {
         GameObject[] everySingleWord = GameObject.FindGameObjectsWithTag("DialogueWord");
@@ -100,24 +117,16 @@ public class DialogueDisplayer : MonoBehaviour {
 
         firstWordMustSpawn = true;
         DisplayNewText(textToDisplay);
-        i = 0;
+        iterator = 0;
 
         finishedLine = false;
         NextLineLogo.SetActive(false);
-
-        //Debug.Log("Resetted dialogue box");
     }
 
 	// Update is called once per frame
-	void Update () {
-
-        //We have to reset this component if a new line must be displayed
-        if (displayNewDialogueLine)
-        {
-            ResetDialogueBubble();
-            displayNewDialogueLine = false;
-        }
-
+	void Update ()
+    {
+        //This is used when the player press "Next Line" when the line is still being in the process of being displayed
         if (skipThisLine && !finishedLine)
         {
             nextCharacterTimer = displaySpeedRate + 1;
@@ -129,7 +138,9 @@ public class DialogueDisplayer : MonoBehaviour {
 
 
        nextCharacterTimer += Time.deltaTime;
-        if (nextCharacterTimer > displaySpeedRate && i < currentWordsToDisplay.Length)
+
+        //Each time the Timer is greater than the set display speed rate, we create the next word to be displayed.
+        if (nextCharacterTimer > displaySpeedRate && iterator < currentWordsToDisplay.Length)
         {
             GameObject spawnedNewWord = SpawnWord();
             setWordStartPos(firstWordMustSpawn, spawnedNewWord);
@@ -137,19 +148,20 @@ public class DialogueDisplayer : MonoBehaviour {
             spawnedNewWord.transform.SetParent(bubbleBackRectTransform.transform);
             previousWordRectTransform = spawnedNewWord.GetComponent<RectTransform>();
 
-            i++;
+            iterator++;
             nextCharacterTimer = 0;
         }
 
-        if (i >= currentWordsToDisplay.Length)
+        //If the iterator is greater than the number of words to display, then we're done with this line, let's prepare ourselves to display the next one (Or to close the dialogue...)
+        if (iterator >= currentWordsToDisplay.Length)
         {
-            //Debug.Log("Reached line end !");
             finishedLine = true;
             NextLineLogo.SetActive(true);
         }
 	}
     
-    void DisplayNewText(string newText)
+    //This method actually separate each words of the line into a string array that will be used to spawn each word's gameObject individually
+    public void DisplayNewText(string newText)
     {
         currentWordsToDisplay = textToDisplay.Split(' ');
     }

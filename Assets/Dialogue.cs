@@ -63,7 +63,7 @@ public class Dialogue : MonoBehaviour {
                 dialogueDisplayer = dialogueDisplayObject.GetComponent<DialogueDisplayer>();
                 dialogueDisplayObject.SetActive(true);
 
-                dialogueDisplayer.InitializeNow();
+                dialogueDisplayer.DisplayNewText(dialogueDisplayer.textToDisplay);
 
                 if (dialogueDisplayObject == null && dialogueDisplayObject.activeInHierarchy)
                     dialogueDisplayer = dialogueDisplayObject.GetComponent<DialogueDisplayer>();

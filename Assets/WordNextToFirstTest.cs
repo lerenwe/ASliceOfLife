@@ -25,11 +25,9 @@ public class WordNextToFirstTest : MonoBehaviour {
         mahRectTransform.localScale = Vector3.one;
     }
 
-
-
     // Update is called once per frame
-    void LateUpdate () {
-
+    void LateUpdate ()
+    {
         #region Set Word Start Position
         if (secondUpdateCall)
         {
