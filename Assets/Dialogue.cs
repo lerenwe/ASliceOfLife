@@ -7,39 +7,46 @@ using Ink.Runtime;
 
 public class Dialogue : MonoBehaviour {
 
-    [SerializeField]
-    private TextAsset inkJSONAsset;
-    private Story story;
+    #region Customizable variables
+        [SerializeField]
+        private TextAsset inkJSONAsset;
 
-    public Canvas thisCanvas;
+        public GameObject[] dialogueCharacters;
+        public bool[] flipSideForThisCharacter;
+    #endregion
 
-    public bool dialogueTriggered = false;
-    public bool dialogueInProgress = false;
-    public string[] dialogueLines;
-    public GameObject characterSpeaking;
-    public GameObject[] dialogueCharacters;
-    string[] charactersName;
-    public bool dialogueClosed = false;
-    public bool[] flipSideForThisCharacter;
+    #region Dialogue Status
+        [HideInInspector] public bool dialogueTriggered = false;
+        [HideInInspector] public bool dialogueInProgress = false;
+        [HideInInspector] public bool dialogueClosed = false;
 
-    bool reachedDialogueEnd = false;
-    bool dialogueStarted = false;
-    bool lastLine = false;
+        int currentLineToDisplay = 0;
+        bool dialogueStarted = false;
+        bool lastLine = false;
+    #endregion
 
-    int currentLineToDisplay = 0;
+    #region External objects & components
+        Canvas thisCanvas;
+        private Story story;
+        DialogueDisplayer dialogueDisplayer;
+        [HideInInspector] public GameObject dialogueDisplayObject;
+        [HideInInspector] public GameObject characterCurrentlySpeaking;
+        string[] charactersName;
+        RectTransform bubblePointRect;
+    #endregion
 
-    DialogueDisplayer dialogueDisplayer;
-    public GameObject dialogueDisplayObject;
-
-	// Use this for initialization
-	void Start ()
+    void Start ()
     {
-	}
+        dialogueDisplayer = dialogueDisplayObject.GetComponent<DialogueDisplayer>();
+        dialogueDisplayer = dialogueDisplayObject.GetComponent<DialogueDisplayer>();
+        thisCanvas = dialogueDisplayer.canvas;
+        bubblePointRect = dialogueDisplayer.bubbleBackRectTransform.transform.FindChild("BubblePointer").GetComponent<RectTransform>();
+    }
 	
+    //This is the method you want to call in order to start displaying the dialogue!
     public void TriggerDialogue ()
     {
         story = new Story(inkJSONAsset.text);
-
 
         charactersName = new string[dialogueCharacters.Length];
         int iterator = 0;
@@ -58,37 +65,27 @@ public class Dialogue : MonoBehaviour {
     {
         if (!dialogueClosed)
         {
-            if (dialogueTriggered || (dialogueInProgress && !lastLine && Input.GetKeyDown("space"))) //Display the first line
+            if (dialogueTriggered || (dialogueInProgress && !lastLine && Input.GetKeyDown("space"))) //Display the first line & the next one when "Next Line" is pressed
             {
-                dialogueDisplayer = dialogueDisplayObject.GetComponent<DialogueDisplayer>();
                 dialogueDisplayObject.SetActive(true);
-
                 dialogueDisplayer.DisplayNewText(dialogueDisplayer.textToDisplay);
-
-                if (dialogueDisplayObject == null && dialogueDisplayObject.activeInHierarchy)
-                    dialogueDisplayer = dialogueDisplayObject.GetComponent<DialogueDisplayer>();
             }
 
             //All of this stuff is to place the bubble correctly
             if (dialogueInProgress)
             {
-                //The character's position is actually its upper sprite bound.
-                Vector3 characterPosition = Camera.main.WorldToScreenPoint(characterSpeaking.transform.position);
-                Vector3 characterMaxBounds = Camera.main.WorldToScreenPoint(characterSpeaking.GetComponent<SpriteRenderer>().bounds.max);
-                //Debug.Log("characterMaxBounds = " + characterMaxBounds);
-                float characterHeight = Mathf.Abs (characterMaxBounds.y - characterPosition.y);
-                float characterWidth = Mathf.Abs(characterMaxBounds.x - characterPosition.x);
-
-                GameObject bubblePoint = dialogueDisplayer.bubbleBackRectTransform.transform.FindChild("BubblePointer").gameObject;
-                RectTransform bubblePointRect = bubblePoint.GetComponent<RectTransform>();
+                //The character's position we use is actually its upper sprite bound.
+                Vector3 characterPosition = Camera.main.WorldToScreenPoint(characterCurrentlySpeaking.transform.position);
+                Vector3 characterMaxBounds = Camera.main.WorldToScreenPoint(characterCurrentlySpeaking.GetComponent<SpriteRenderer>().bounds.max);
 
                 Vector3 bubbleTargetPos;
 
+                //This is to keep track of which character is speaking, and apply to each one wether the bubble must be displayed on their left or right
                 int speakingCharacterNumber = 0;
 
                 foreach (GameObject character in dialogueCharacters)
                 {
-                    if (character == characterSpeaking)
+                    if (character == characterCurrentlySpeaking)
                     {
                         break;
                     }
@@ -99,6 +96,8 @@ public class Dialogue : MonoBehaviour {
                 }
 
                 //This is where we set up the position of the bubble according to the speaking character
+                float characterWidth = Mathf.Abs(characterMaxBounds.x - characterPosition.x);
+
                 if (!flipSideForThisCharacter[speakingCharacterNumber])
                 {
                     bubbleTargetPos = new Vector3(characterPosition.x - dialogueDisplayer.bubbleBackRectTransform.rect.width / 2,
@@ -116,15 +115,19 @@ public class Dialogue : MonoBehaviour {
 
                 //Then, let's prevent the bubble for getting out of the screen if the character is too close to one of the vertical borders of the screen
                 float xMarginForBubble = Screen.width * dialogueDisplayer.screenMarginPercentage;
-                bubbleTargetPos.x = Mathf.Clamp(bubbleTargetPos.x, xMarginForBubble + dialogueDisplayer.bubbleBackRectTransform.rect.size.x * thisCanvas.scaleFactor / 2, Screen.width - xMarginForBubble - dialogueDisplayer.bubbleBackRectTransform.rect.size.x * thisCanvas.scaleFactor / 2);
+
+                bubbleTargetPos.x = Mathf.Clamp(bubbleTargetPos.x,
+                                                xMarginForBubble + dialogueDisplayer.bubbleBackRectTransform.rect.size.x * thisCanvas.scaleFactor / 2,
+                                                Screen.width - xMarginForBubble - dialogueDisplayer.bubbleBackRectTransform.rect.size.x * thisCanvas.scaleFactor / 2);
+
                 dialogueDisplayer.bubbleBackRectTransform.position = bubbleTargetPos;
-                //Debug.Log("Final Bubble Pos is " + dialogueDisplayer.bubbleBackRectTransform.position.x);
 
                 //Let's do the same to prevent the pointer to get beyond the bubble's borders
                 Vector3 bubblePointTargetPos = new Vector2(characterPosition.x, bubblePointRect.position.y);
                 bubblePointTargetPos.x = Mathf.Clamp(bubblePointTargetPos.x,
-                    dialogueDisplayer.bubbleBackRectTransform.position.x - dialogueDisplayer.bubbleBackRectTransform.rect.width * thisCanvas.scaleFactor / 2 + 50, //TO DO : REPLACE "50" BY PERCENTAGE OF BUBBLE'S WIDTH
-                    dialogueDisplayer.bubbleBackRectTransform.position.x + dialogueDisplayer.bubbleBackRectTransform.rect.width * thisCanvas.scaleFactor / 2 - 50);
+                    dialogueDisplayer.bubbleBackRectTransform.position.x - dialogueDisplayer.bubbleBackRectTransform.rect.width * thisCanvas.scaleFactor / 2 + dialogueDisplayer.bubbleBackRectTransform.rect.width * .1f,
+                    dialogueDisplayer.bubbleBackRectTransform.position.x + dialogueDisplayer.bubbleBackRectTransform.rect.width * thisCanvas.scaleFactor / 2 - dialogueDisplayer.bubbleBackRectTransform.rect.width * .1f);
+
                 bubblePointRect.position = bubblePointTargetPos;
 
                 //Then let's flip the pointer according to its position relative to the bubble's vertical center
@@ -144,15 +147,16 @@ public class Dialogue : MonoBehaviour {
 
             if (dialogueDisplayer != null)
             {
-                if (!dialogueClosed && Input.GetKeyDown("space") && !dialogueDisplayer.finishedLine) //Skip line
+                //Skip line if it's being in the process of getting displayed and player pressed "Next Line" Button
+                if (!dialogueClosed && Input.GetKeyDown("space") && !dialogueDisplayer.finishedLine) 
                 {
-                    Debug.Log("Skipped dialogue line");
                     dialogueDisplayer.skipThisLine = true;
                 }
-                else if (dialogueTriggered || (dialogueInProgress && !lastLine && Input.GetKeyDown("space") && dialogueDisplayer.finishedLine)) //Display the next line
+                //But if the line has finished being displayed, 
+                else if (dialogueTriggered || (dialogueInProgress && !lastLine && Input.GetKeyDown("space") && dialogueDisplayer.finishedLine)) 
                 {
                     //Then we finally display the text on top of all that
-                    string text = story.Continue().Trim(); // EXPERIMENTAL INK
+                    string text = story.Continue().Trim();
 
                     //Parsing who's speaking right now
                     string firstWord = text.Split(':').First();
@@ -161,37 +165,28 @@ public class Dialogue : MonoBehaviour {
                     {
                         if (firstWord.Equals(character.transform.name))
                         {
-                            characterSpeaking = character;
+                            characterCurrentlySpeaking = character;
                             break;
                         }
                     }
 
-                    //dialogueDisplayer.textToDisplay = dialogueLines[currentLineToDisplay];
-                    text = text.Replace(characterSpeaking.transform.name + ":", "");
-                    dialogueDisplayer.textToDisplay = text.Trim(); // EXPERIMENTAL INK
+                    //Let's then remove the character name from the text to display
+                    text = text.Replace(characterCurrentlySpeaking.transform.name + ":", "");
+                    dialogueDisplayer.textToDisplay = text.Trim();
 
+                    //At this point we mark the dialogue has in progress. Triggered is used only at the exact moment the dialogue is triggered.
                     dialogueDisplayer.ResetDialogueBubble();
                     dialogueTriggered = false;
                     dialogueInProgress = true;
 
-
-                    /*if (currentLineToDisplay < dialogueLines.Length - 1)
-                        currentLineToDisplay++;
-                    else
-                    {
-                        dialogueInProgress = false;
-                        Debug.Log("Dialogue is over");
-                    }*/
-
                     if(!story.canContinue)
                     {
-                        lastLine = true;
-                        Debug.Log("Dialogue is over");
+                        lastLine = true; //We reached the last line, the dialogue is now over and ready to be closed
                     }
                 }
-                else if (dialogueStarted && lastLine && Input.GetKeyDown("space") && dialogueDisplayer.finishedLine) //Close dialogue 
+                //Close dialogue when we reached the last line and the player pressed the "Next Line" key
+                else if (dialogueStarted && lastLine && Input.GetKeyDown("space") && dialogueDisplayer.finishedLine) 
                 {
-                    Debug.Log("End of Dialogue");
                     dialogueInProgress = false;
                     dialogueDisplayObject.SetActive(false);
                     dialogueClosed = true;
