@@ -28,7 +28,8 @@ public class DialogueDisplayer : MonoBehaviour {
     #endregion
 
     #region External Components
-        [HideInInspector] public Canvas canvas;
+        [Tooltip ("If you live this space blank, BubbleGum will automatically get the first active Canvas it can find.")]
+        public Canvas canvas;
         GameObject NextLineLogo;
     #endregion
 
@@ -64,7 +65,12 @@ public class DialogueDisplayer : MonoBehaviour {
     void Start ()
     {
         //Getting external components and objects
-        canvas = GameObject.Find("GameStateManager").GetComponent<Canvas>();
+        if (canvas == null)
+            canvas = GameObject.FindObjectOfType<Canvas>();
+
+        if (canvas == null)
+            Debug.LogError("BubbleGum can't find any active Canvas in the scene, please add at least one.");
+
         NextLineLogo = GameObject.Find("ContinueSpeechLogo").gameObject;
         bubbleBackImage = gameObject.GetComponentInChildren<Image>();
         bubbleBackRectTransform = bubbleBackImage.gameObject.GetComponent<RectTransform>();

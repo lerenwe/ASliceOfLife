@@ -1,0 +1,3 @@
+-Character1: Okay it does seems that it's working.
+-Character2: Yup, we can all relax, and chill and all cool y'know.
+- ->END

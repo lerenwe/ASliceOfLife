@@ -23,6 +23,7 @@ public class Dialogue : MonoBehaviour {
         int currentLineToDisplay = 0;
         bool dialogueStarted = false;
         bool lastLine = false;
+        bool firstInit = true;
     #endregion
 
     #region External objects & components
@@ -37,9 +38,8 @@ public class Dialogue : MonoBehaviour {
 
     void Start ()
     {
+        dialogueDisplayObject = GameObject.Find("DialogueDisplay");
         dialogueDisplayer = dialogueDisplayObject.GetComponent<DialogueDisplayer>();
-        dialogueDisplayer = dialogueDisplayObject.GetComponent<DialogueDisplayer>();
-        thisCanvas = dialogueDisplayer.canvas;
         bubblePointRect = dialogueDisplayer.bubbleBackRectTransform.transform.FindChild("BubblePointer").GetComponent<RectTransform>();
     }
 	
@@ -63,6 +63,12 @@ public class Dialogue : MonoBehaviour {
 	// Update is called once per frame
 	void LateUpdate ()
     {
+        if (firstInit)
+        {
+            thisCanvas = dialogueDisplayer.canvas;
+            firstInit = false;
+        }
+
         if (!dialogueClosed)
         {
             if (dialogueTriggered || (dialogueInProgress && !lastLine && Input.GetKeyDown("space"))) //Display the first line & the next one when "Next Line" is pressed
@@ -168,13 +174,18 @@ public class Dialogue : MonoBehaviour {
                             characterCurrentlySpeaking = character;
                             break;
                         }
+
+                        if (characterCurrentlySpeaking == null)
+                        {
+                            Debug.LogError("None of the character's gameObject name matches the name ''" + firstWord + "'' in the Ink script. Please check that the names perfectly matches, including case.");
+                        }
                     }
 
                     //Let's then remove the character name from the text to display
                     text = text.Replace(characterCurrentlySpeaking.transform.name + ":", "");
                     dialogueDisplayer.textToDisplay = text.Trim();
 
-                    //At this point we mark the dialogue has in progress. Triggered is used only at the exact moment the dialogue is triggered.
+                    //At this point we mark the dialogue as in progress. Triggered is used only at the exact moment the dialogue is triggered.
                     dialogueDisplayer.ResetDialogueBubble();
                     dialogueTriggered = false;
                     dialogueInProgress = true;
