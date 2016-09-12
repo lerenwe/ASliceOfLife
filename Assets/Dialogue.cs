@@ -34,6 +34,7 @@ public class Dialogue : MonoBehaviour {
         [HideInInspector] public GameObject characterCurrentlySpeaking;
         string[] charactersName;
         RectTransform bubblePointRect;
+        Image[] AllImages;
     #endregion
 
     void Start ()
@@ -65,6 +66,7 @@ public class Dialogue : MonoBehaviour {
     {
         if (firstInit)
         {
+            AllImages = dialogueDisplayer.AllImages;
             thisCanvas = dialogueDisplayer.canvas;
             firstInit = false;
         }
@@ -73,7 +75,10 @@ public class Dialogue : MonoBehaviour {
         {
             if (dialogueTriggered || (dialogueInProgress && !lastLine && Input.GetKeyDown("space"))) //Display the first line & the next one when "Next Line" is pressed
             {
-                dialogueDisplayObject.SetActive(true);
+                //dialogueDisplayObject.SetActive(true);
+
+
+
                 dialogueDisplayer.DisplayNewText(dialogueDisplayer.textToDisplay);
             }
 
@@ -149,6 +154,11 @@ public class Dialogue : MonoBehaviour {
                 }
 
                 bubblePointRect.position = bubblePointTargetPos;
+
+                foreach (Image image in AllImages)
+                {
+                    image.enabled = true; // And finally display all images
+                }
             }
 
             if (dialogueDisplayer != null)
@@ -199,7 +209,20 @@ public class Dialogue : MonoBehaviour {
                 else if (dialogueStarted && lastLine && Input.GetKeyDown("space") && dialogueDisplayer.finishedLine) 
                 {
                     dialogueInProgress = false;
-                    dialogueDisplayObject.SetActive(false);
+                    //dialogueDisplayObject.SetActive(false);
+
+                    foreach (Image image in AllImages)
+                    {
+                        image.enabled = false;
+                    }
+
+                    GameObject[] AllWords = GameObject.FindGameObjectsWithTag("DialogueWord");
+
+                    foreach (GameObject word in AllWords)
+                    {
+                        Destroy(word);
+                    }
+
                     dialogueClosed = true;
                 }
             }

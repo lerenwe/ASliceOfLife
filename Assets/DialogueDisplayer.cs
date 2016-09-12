@@ -28,9 +28,12 @@ public class DialogueDisplayer : MonoBehaviour {
     #endregion
 
     #region External Components
-        [Tooltip ("If you live this space blank, BubbleGum will automatically get the first active Canvas it can find.")]
+    //[Tooltip ("If you live this space blank, BubbleGum will automatically get the first active Canvas it can find.")]
+        [HideInInspector]
         public Canvas canvas;
         GameObject NextLineLogo;
+        [HideInInspector]
+        public Image[] AllImages;
     #endregion
 
     #region Inspector Variables
@@ -65,19 +68,28 @@ public class DialogueDisplayer : MonoBehaviour {
     void Start ()
     {
         //Getting external components and objects
-        if (canvas == null)
+
+        /*if (canvas == null)
             canvas = GameObject.FindObjectOfType<Canvas>();
 
         if (canvas == null)
-            Debug.LogError("BubbleGum can't find any active Canvas in the scene, please add at least one.");
+            Debug.LogError("BubbleGum can't find any active Canvas in the scene, please add at least one.");*/
+
+        canvas = gameObject.GetComponent<Canvas>();
 
         NextLineLogo = GameObject.Find("ContinueSpeechLogo").gameObject;
         bubbleBackImage = gameObject.GetComponentInChildren<Image>();
         bubbleBackRectTransform = bubbleBackImage.gameObject.GetComponent<RectTransform>();
+        AllImages = transform.GetComponentsInChildren<Image>();
 
         //At game start, we want to hide the bubbles
         NextLineLogo.SetActive(false);
-        gameObject.SetActive(false);
+        
+        foreach (Image image in AllImages)
+        {
+            image.enabled = false;
+        }
+        //gameObject.SetActive(false);
     }
 
     //Spawn a word and return the created gameObject
