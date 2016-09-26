@@ -30,23 +30,20 @@ public class Dialogue : MonoBehaviour {
         Canvas thisCanvas;
         private Story story;
         DialogueDisplayer dialogueDisplayer;
-        [HideInInspector] public GameObject dialogueDisplayObject;
+        static public GameObject dialogueDisplayObject;
         [HideInInspector] public GameObject characterCurrentlySpeaking;
         string[] charactersName;
         RectTransform bubblePointRect;
         Image[] AllImages;
     #endregion
-
-    void Start ()
-    {
-        dialogueDisplayObject = GameObject.Find("DialogueDisplay");
-        dialogueDisplayer = dialogueDisplayObject.GetComponent<DialogueDisplayer>();
-        bubblePointRect = dialogueDisplayer.bubbleBackRectTransform.transform.FindChild("BubblePointer").GetComponent<RectTransform>();
-    }
 	
     //This is the method you want to call in order to start displaying the dialogue!
     public void TriggerDialogue ()
     {
+        dialogueDisplayObject.SetActive(true);
+        dialogueDisplayer = dialogueDisplayObject.GetComponent<DialogueDisplayer>();
+        bubblePointRect = dialogueDisplayer.bubbleBackRectTransform.transform.FindChild("BubblePointer").GetComponent<RectTransform>();
+
         story = new Story(inkJSONAsset.text);
 
         charactersName = new string[dialogueCharacters.Length];
@@ -64,7 +61,7 @@ public class Dialogue : MonoBehaviour {
 	// Update is called once per frame
 	void LateUpdate ()
     {
-        if (firstInit)
+        if (firstInit && dialogueTriggered)
         {
             AllImages = dialogueDisplayer.AllImages;
             thisCanvas = dialogueDisplayer.canvas;
@@ -75,10 +72,6 @@ public class Dialogue : MonoBehaviour {
         {
             if (dialogueTriggered || (dialogueInProgress && !lastLine && Input.GetKeyDown("space"))) //Display the first line & the next one when "Next Line" is pressed
             {
-                //dialogueDisplayObject.SetActive(true);
-
-
-
                 dialogueDisplayer.DisplayNewText(dialogueDisplayer.textToDisplay);
             }
 
@@ -208,8 +201,7 @@ public class Dialogue : MonoBehaviour {
                 //Close dialogue when we reached the last line and the player pressed the "Next Line" key
                 else if (dialogueStarted && lastLine && Input.GetKeyDown("space") && dialogueDisplayer.finishedLine) 
                 {
-                    dialogueInProgress = false;
-                    //dialogueDisplayObject.SetActive(false);
+                    ResetDialogue();
 
                     foreach (Image image in AllImages)
                     {
@@ -223,10 +215,24 @@ public class Dialogue : MonoBehaviour {
                         Destroy(word);
                     }
 
-                    dialogueClosed = true;
+                    dialogueDisplayer.ResetDialogueBubble();
+
+                    dialogueDisplayObject.SetActive(false);
+                    //dialogueClosed = true;
                 }
             }
-
         }
+    }
+
+    void ResetDialogue() //Reset this dialogue when closed, in case it must be triggered again later
+    {
+        dialogueInProgress = false;
+        dialogueTriggered = false;
+        dialogueClosed = false;
+        dialogueStarted = false;
+        lastLine = false;
+        firstInit = true;
+        currentLineToDisplay = 0;
+        story.ResetState();
     }
 }

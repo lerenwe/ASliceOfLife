@@ -1,8 +1,8 @@
-﻿using UnityEngine;
-using UnityEngine.UI;
+﻿using Ink.Runtime;
 using System.Collections;
 using System.Collections.Generic;
-using Ink.Runtime;
+using UnityEngine;
+using UnityEngine.UI;
 
 public class DialogueDisplayer : MonoBehaviour {
 
@@ -68,13 +68,6 @@ public class DialogueDisplayer : MonoBehaviour {
     void Start ()
     {
         //Getting external components and objects
-
-        /*if (canvas == null)
-            canvas = GameObject.FindObjectOfType<Canvas>();
-
-        if (canvas == null)
-            Debug.LogError("BubbleGum can't find any active Canvas in the scene, please add at least one.");*/
-
         canvas = gameObject.GetComponent<Canvas>();
 
         NextLineLogo = GameObject.Find("ContinueSpeechLogo").gameObject;
@@ -89,7 +82,9 @@ public class DialogueDisplayer : MonoBehaviour {
         {
             image.enabled = false;
         }
-        //gameObject.SetActive(false);
+
+        Dialogue.dialogueDisplayObject = this.gameObject; 
+        gameObject.SetActive(false);
     }
 
     //Spawn a word and return the created gameObject
