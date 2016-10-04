@@ -46,7 +46,7 @@ public class SoccerSequenceManager : MonoBehaviour {
 
         if (waitingForDialogueEnd && thisDialogue.GetComponent<Dialogue>().dialogueClosed)
         {
-            waitingForDialogueEnd = false;
+            //waitingForDialogueEnd = false;
 
             Debug.Log("Going to point...");
             soccerKidScript.moveTowardTargetPoint = true;
@@ -55,13 +55,15 @@ public class SoccerSequenceManager : MonoBehaviour {
             {
                 Destroy(soccerKid.gameObject);
                 playerScript.canControl = true;
+                waitingForDialogueEnd = false;
+                Debug.Log("Finished Sequence Soccer");
             }
         }
 
-        if (soccerKidScript != null && soccerKidScript.onDestinationPoint)
+        if (soccerKidScript != null && soccerKidScript.onDestinationPoint && !thisDialogue.GetComponent<Dialogue>().dialogueClosed)
         {
             thisDialogue.GetComponent<Dialogue>().TriggerDialogue();
-            //Debug.Log("TRIGGERED HOLY SHIT");
+            Debug.Log("Triggered Soccer Dialogue");
             ballDisappeared = false;
             soccerKidScript.moveTowardPlayer = false;
             waitingForDialogueEnd = true;

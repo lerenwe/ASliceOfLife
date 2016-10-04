@@ -40,6 +40,7 @@ public class Dialogue : MonoBehaviour {
     //This is the method you want to call in order to start displaying the dialogue!
     public void TriggerDialogue ()
     {
+        dialogueClosed = false; //Just in case the dialogue was previously closed
         dialogueDisplayObject.SetActive(true);
         dialogueDisplayer = dialogueDisplayObject.GetComponent<DialogueDisplayer>();
         bubblePointRect = dialogueDisplayer.bubbleBackRectTransform.transform.FindChild("BubblePointer").GetComponent<RectTransform>();
@@ -203,6 +204,8 @@ public class Dialogue : MonoBehaviour {
                 {
                     ResetDialogue();
 
+                    dialogueClosed = true;
+
                     foreach (Image image in AllImages)
                     {
                         image.enabled = false;
@@ -228,7 +231,6 @@ public class Dialogue : MonoBehaviour {
     {
         dialogueInProgress = false;
         dialogueTriggered = false;
-        dialogueClosed = false;
         dialogueStarted = false;
         lastLine = false;
         firstInit = true;
