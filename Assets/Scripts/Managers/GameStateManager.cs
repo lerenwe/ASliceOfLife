@@ -17,6 +17,14 @@ public class GameStateManager : MonoBehaviour {
 
     public static Image FadeImage;
 
+    bool TitleScreenSequence = true;
+    bool TitleScreenTriggered = false;
+    bool TitleScreenFinished = false;
+
+    public bool enablePushStart = false;
+
+    Image titleLogo;
+
     // Use this for initialization
     void Start()
     {
@@ -27,7 +35,8 @@ public class GameStateManager : MonoBehaviour {
 
         subScenes = GameObject.FindGameObjectsWithTag("subScene");
 
-        StartCoroutine(FadeIn());
+        titleLogo = transform.FindChild("TitleLogo").GetComponent<Image>();
+        StartCoroutine(FadeInAnyPicture(titleLogo));
     }
 
     void Awake ()
@@ -37,6 +46,30 @@ public class GameStateManager : MonoBehaviour {
 	// Update is called once per frame
 	void Update ()
     {
+
+        Debug.Log(titleLogo.canvasRenderer.GetColor().a);
+
+        if (Input.GetButtonDown("Submit") && TitleScreenTriggered != true && titleLogo.color.a > .9f)
+        {
+            TitleScreenSequence = true;
+            TitleScreenTriggered = true;
+            Destroy(transform.Find("PressStart").gameObject);
+        }
+
+        if (TitleScreenSequence && TitleScreenTriggered)
+        {
+            StartCoroutine(FadeIn());
+            TitleScreenSequence = false;
+        }
+        
+        if (!TitleScreenSequence && TitleScreenTriggered && FadeImage.canvasRenderer.GetColor().a <= .01f && !TitleScreenFinished)
+        {
+            StartCoroutine(FadeOutAnyPicture(titleLogo));
+            TitleScreenFinished = true;
+        }
+
+
+
         #region Get Current Active Scene
         //The active scene is where the main character is
         Bounds localizedBackGroundBounds;
@@ -60,6 +93,18 @@ public class GameStateManager : MonoBehaviour {
 
     }
 
+    public static IEnumerator FadeOutAnyPicture (Image pictureToFade)
+    {
+        pictureToFade.CrossFadeColor(new Color(0, 0, 0, 0), 1f, true, true);
+        yield return new WaitForSeconds(1f);
+    }
+
+    public static IEnumerator FadeInAnyPicture(Image pictureToFade)
+    {
+        pictureToFade.CrossFadeColor(new Color(1, 1, 1, 1), 1f, true, true);
+        yield return new WaitForSeconds(1f);
+    }
+
     public static IEnumerator FadeIn ()
     {
         yield return new WaitForSeconds(Time.deltaTime);
@@ -77,8 +122,6 @@ public class GameStateManager : MonoBehaviour {
         yield return new WaitForSeconds(1f);
         player.GetComponent<PlayerControls>().canControl = true;
         FadingIn = false;
-
-        
     }
 
     public static IEnumerator FadeOut()

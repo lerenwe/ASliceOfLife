@@ -71,7 +71,7 @@ public class Dialogue : MonoBehaviour {
 
         if (!dialogueClosed)
         {
-            if (dialogueTriggered || (dialogueInProgress && !lastLine && Input.GetKeyDown("space"))) //Display the first line & the next one when "Next Line" is pressed
+            if (dialogueTriggered || (dialogueInProgress && !lastLine &&Input.GetButtonDown("Submit"))) //Display the first line & the next one when "Next Line" is pressed
             {
                 dialogueDisplayer.DisplayNewText(dialogueDisplayer.textToDisplay);
             }
@@ -158,12 +158,12 @@ public class Dialogue : MonoBehaviour {
             if (dialogueDisplayer != null)
             {
                 //Skip line if it's being in the process of getting displayed and player pressed "Next Line" Button
-                if (!dialogueClosed && Input.GetKeyDown("space") && !dialogueDisplayer.finishedLine) 
+                if (!dialogueClosed &&Input.GetButtonDown("Submit") && !dialogueDisplayer.finishedLine) 
                 {
                     dialogueDisplayer.skipThisLine = true;
                 }
                 //But if the line has finished being displayed, 
-                else if (dialogueTriggered || (dialogueInProgress && !lastLine && Input.GetKeyDown("space") && dialogueDisplayer.finishedLine)) 
+                else if (dialogueTriggered || (dialogueInProgress && !lastLine &&Input.GetButtonDown("Submit") && dialogueDisplayer.finishedLine)) 
                 {
                     //Then we finally display the text on top of all that
                     string text = story.Continue().Trim();
@@ -200,7 +200,7 @@ public class Dialogue : MonoBehaviour {
                     }
                 }
                 //Close dialogue when we reached the last line and the player pressed the "Next Line" key
-                else if (dialogueStarted && lastLine && Input.GetKeyDown("space") && dialogueDisplayer.finishedLine) 
+                else if (dialogueStarted && lastLine &&Input.GetButtonDown("Submit") && dialogueDisplayer.finishedLine) 
                 {
                     ResetDialogue();
 
