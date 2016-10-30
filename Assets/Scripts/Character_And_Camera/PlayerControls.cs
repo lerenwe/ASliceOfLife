@@ -8,8 +8,7 @@ public class PlayerControls : MonoBehaviour {
 
     [HideInInspector]
     public Vector3 moveDirection;
-    [HideInInspector]
-    public bool canControl = true;
+    public static bool canControl = true;
     [HideInInspector]
     public bool isGrounded = false;
 

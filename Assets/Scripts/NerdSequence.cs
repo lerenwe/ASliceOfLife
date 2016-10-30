@@ -26,7 +26,7 @@ public class NerdSequence : subSceneExit {
 
         if (isSporty)
         {
-            GameStateManager.player.GetComponent<PlayerControls>().canControl = false;
+            PlayerControls.canControl = false;
 
             GameStateManager.player.GetComponent<SpriteRenderer>().flipX = false;
 

@@ -19,7 +19,7 @@ public class GameStateManager : MonoBehaviour {
 
     bool TitleScreenSequence = true;
     bool TitleScreenTriggered = false;
-    bool TitleScreenFinished = false;
+    bool  TitleScreenFinished = false;
 
     public bool enablePushStart = false;
 
@@ -37,6 +37,8 @@ public class GameStateManager : MonoBehaviour {
 
         titleLogo = transform.FindChild("TitleLogo").GetComponent<Image>();
         StartCoroutine(FadeInAnyPicture(titleLogo));
+
+        player.GetComponent<Animator>().SetTrigger("Sleep");
     }
 
     void Awake ()
@@ -46,10 +48,7 @@ public class GameStateManager : MonoBehaviour {
 	// Update is called once per frame
 	void Update ()
     {
-
-        Debug.Log(titleLogo.canvasRenderer.GetColor().a);
-
-        if (Input.GetButtonDown("Submit") && TitleScreenTriggered != true && titleLogo.color.a > .9f)
+        if (Input.anyKeyDown && TitleScreenTriggered != true && titleLogo.color.a > .9f)
         {
             TitleScreenSequence = true;
             TitleScreenTriggered = true;
@@ -110,7 +109,7 @@ public class GameStateManager : MonoBehaviour {
         yield return new WaitForSeconds(Time.deltaTime);
 
         //Debug.Log("Waiting for player to be grounded...");
-        //Debug.Log("Player grounded = " + GameStateManager.player.GetComponent<PlayerControls>().isGrounded);
+        //Debug.Log("Player grounded = " + GameStateManager.PlayerControls.isGrounded);
         while (!GameStateManager.player.GetComponent<PlayerControls>().isGrounded)
             yield return null;
         //Debug.Log("Player is grounded, proceeding...");
@@ -118,9 +117,9 @@ public class GameStateManager : MonoBehaviour {
         //Debug.Log("Fade In");
         FadingIn = true;
         FadeImage.CrossFadeColor(new Color(0, 0, 0, 0), 1f, false, true);
-        player.GetComponent<PlayerControls>().canControl = false;
+        PlayerControls.canControl = false;
         yield return new WaitForSeconds(1f);
-        player.GetComponent<PlayerControls>().canControl = true;
+        PlayerControls.canControl = true;
         FadingIn = false;
     }
 
@@ -129,9 +128,9 @@ public class GameStateManager : MonoBehaviour {
         Debug.Log("Fade Out");
         FadingOut = true;
         FadeImage.CrossFadeColor(new Color(0, 0, 0, 1), 1f, false, true);
-        player.GetComponent<PlayerControls>().canControl = false;
+        PlayerControls.canControl = false;
         yield return new WaitForSeconds(1f);
-        player.GetComponent<PlayerControls>().canControl = true;
+        PlayerControls.canControl = true;
         FadingOut = false;
     }
 
