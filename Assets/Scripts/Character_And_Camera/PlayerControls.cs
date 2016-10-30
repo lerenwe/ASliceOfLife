@@ -30,6 +30,7 @@ public class PlayerControls : MonoBehaviour {
 
     [HideInInspector]
     public bool shoveAnimFinished = false;
+    InteractionLogoPosition interactLogo;
 
     // Use this for initialization
     void Start ()
@@ -42,6 +43,9 @@ public class PlayerControls : MonoBehaviour {
         #endregion
 
         distToGround = gameObject.GetComponent<Collider2D>().bounds.extents.y;
+
+        interactLogo = GameObject.Find("InteractionLogo").GetComponent<InteractionLogoPosition>();
+        interactLogo.gameObject.SetActive(false);
     }
 
     // Update is called once per frame
@@ -142,5 +146,25 @@ public class PlayerControls : MonoBehaviour {
     void ManageAnimator ()
     {
         animator.SetFloat("outSpeed", Mathf.Abs (moveDirection.x));
+    }
+
+    void OnTriggerEnter2D (Collider2D hit)
+    {
+        if (hit.CompareTag ("Exit"))
+        {
+            Debug.Log("Overlapping Exit");
+            interactLogo.gameObject.SetActive (true);
+            interactLogo.enableUpdate = true;
+        }
+    }
+
+    void OnTriggerExit2D (Collider2D hit)
+    {
+        if (hit.CompareTag("Exit"))
+        {
+            Debug.Log("Exited exit, well you know...");
+            interactLogo.enableUpdate = false;
+            interactLogo.gameObject.SetActive (false);
+        }
     }
 }

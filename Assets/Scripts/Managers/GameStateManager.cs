@@ -6,6 +6,8 @@ using System.Xml;
 
 public class GameStateManager : MonoBehaviour {
 
+    public bool SkipTitleScreen = false;
+
     public GameObject[] subScenes;
     public static GameObject currentActiveScene;
     public static GameObject player;
@@ -35,10 +37,21 @@ public class GameStateManager : MonoBehaviour {
 
         subScenes = GameObject.FindGameObjectsWithTag("subScene");
 
-        titleLogo = transform.FindChild("TitleLogo").GetComponent<Image>();
-        StartCoroutine(FadeInAnyPicture(titleLogo));
+        if (!SkipTitleScreen)
+        {
+            titleLogo = transform.FindChild("TitleLogo").GetComponent<Image>();
+            StartCoroutine(FadeInAnyPicture(titleLogo));
 
-        player.GetComponent<Animator>().SetTrigger("Sleep");
+            player.GetComponent<Animator>().SetTrigger("Sleep");
+
+        }
+        else
+        {
+            titleLogo = transform.FindChild("TitleLogo").GetComponent<Image>();
+            StartCoroutine(FadeOutAnyPicture(titleLogo));
+            StartCoroutine (FadeIn());
+            TitleScreenFinished = true;
+        }
     }
 
     void Awake ()
@@ -48,23 +61,26 @@ public class GameStateManager : MonoBehaviour {
 	// Update is called once per frame
 	void Update ()
     {
-        if (Input.anyKeyDown && TitleScreenTriggered != true && titleLogo.color.a > .9f)
+        if (!SkipTitleScreen)
         {
-            TitleScreenSequence = true;
-            TitleScreenTriggered = true;
-            Destroy(transform.Find("PressStart").gameObject);
-        }
+            if (Input.anyKeyDown && TitleScreenTriggered != true && titleLogo.color.a > .9f)
+            {
+                TitleScreenSequence = true;
+                TitleScreenTriggered = true;
+                Destroy(transform.Find("PressStart").gameObject);
+            }
 
-        if (TitleScreenSequence && TitleScreenTriggered)
-        {
-            StartCoroutine(FadeIn());
-            TitleScreenSequence = false;
-        }
-        
-        if (!TitleScreenSequence && TitleScreenTriggered && FadeImage.canvasRenderer.GetColor().a <= .01f && !TitleScreenFinished)
-        {
-            StartCoroutine(FadeOutAnyPicture(titleLogo));
-            TitleScreenFinished = true;
+            if (TitleScreenSequence && TitleScreenTriggered)
+            {
+                StartCoroutine(FadeIn());
+                TitleScreenSequence = false;
+            }
+
+            if (!TitleScreenSequence && TitleScreenTriggered && FadeImage.canvasRenderer.GetColor().a <= .01f && !TitleScreenFinished)
+            {
+                StartCoroutine(FadeOutAnyPicture(titleLogo));
+                TitleScreenFinished = true;
+            }
         }
 
 
