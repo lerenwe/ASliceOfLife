@@ -40,13 +40,13 @@ public class TriggerMomSequence : subSceneExit {
     {
         
         momObject.GetComponent<SpriteRenderer>().enabled = true;
-        playerScript.canControl = false;
+        PlayerControls.canControl = false;
         AlreadyTrigger = true;
         doorExit.GetComponent<Collider2D>().enabled = false;
 
         yield return StartCoroutine(WaitForKeyDown(KeyCode.Space));
 
-        playerScript.canControl = true;
+        PlayerControls.canControl = true;
         momObject.GetComponent<SpriteRenderer>().enabled = false;
     }
 

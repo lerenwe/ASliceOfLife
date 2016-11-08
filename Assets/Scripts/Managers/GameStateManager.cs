@@ -6,6 +6,8 @@ using System.Xml;
 
 public class GameStateManager : MonoBehaviour {
 
+    public bool SkipTitleScreen = false;
+
     public GameObject[] subScenes;
     public static GameObject currentActiveScene;
     public static GameObject player;
@@ -17,6 +19,14 @@ public class GameStateManager : MonoBehaviour {
 
     public static Image FadeImage;
 
+    bool TitleScreenSequence = true;
+    bool TitleScreenTriggered = false;
+    bool  TitleScreenFinished = false;
+
+    public bool enablePushStart = false;
+
+    Image titleLogo;
+
     // Use this for initialization
     void Start()
     {
@@ -27,7 +37,21 @@ public class GameStateManager : MonoBehaviour {
 
         subScenes = GameObject.FindGameObjectsWithTag("subScene");
 
-        StartCoroutine(FadeIn());
+        if (!SkipTitleScreen)
+        {
+            titleLogo = transform.FindChild("TitleLogo").GetComponent<Image>();
+            StartCoroutine(FadeInAnyPicture(titleLogo));
+
+            player.GetComponent<Animator>().SetTrigger("Sleep");
+
+        }
+        else
+        {
+            titleLogo = transform.FindChild("TitleLogo").GetComponent<Image>();
+            StartCoroutine(FadeOutAnyPicture(titleLogo));
+            StartCoroutine (FadeIn());
+            TitleScreenFinished = true;
+        }
     }
 
     void Awake ()
@@ -37,6 +61,30 @@ public class GameStateManager : MonoBehaviour {
 	// Update is called once per frame
 	void Update ()
     {
+        if (!SkipTitleScreen)
+        {
+            if (Input.anyKeyDown && TitleScreenTriggered != true && titleLogo.color.a > .9f)
+            {
+                TitleScreenSequence = true;
+                TitleScreenTriggered = true;
+                Destroy(transform.Find("PressStart").gameObject);
+            }
+
+            if (TitleScreenSequence && TitleScreenTriggered)
+            {
+                StartCoroutine(FadeIn());
+                TitleScreenSequence = false;
+            }
+
+            if (!TitleScreenSequence && TitleScreenTriggered && FadeImage.canvasRenderer.GetColor().a <= .01f && !TitleScreenFinished)
+            {
+                StartCoroutine(FadeOutAnyPicture(titleLogo));
+                TitleScreenFinished = true;
+            }
+        }
+
+
+
         #region Get Current Active Scene
         //The active scene is where the main character is
         Bounds localizedBackGroundBounds;
@@ -60,12 +108,24 @@ public class GameStateManager : MonoBehaviour {
 
     }
 
+    public static IEnumerator FadeOutAnyPicture (Image pictureToFade)
+    {
+        pictureToFade.CrossFadeColor(new Color(0, 0, 0, 0), 1f, true, true);
+        yield return new WaitForSeconds(1f);
+    }
+
+    public static IEnumerator FadeInAnyPicture(Image pictureToFade)
+    {
+        pictureToFade.CrossFadeColor(new Color(1, 1, 1, 1), 1f, true, true);
+        yield return new WaitForSeconds(1f);
+    }
+
     public static IEnumerator FadeIn ()
     {
         yield return new WaitForSeconds(Time.deltaTime);
 
         //Debug.Log("Waiting for player to be grounded...");
-        //Debug.Log("Player grounded = " + GameStateManager.player.GetComponent<PlayerControls>().isGrounded);
+        //Debug.Log("Player grounded = " + GameStateManager.PlayerControls.isGrounded);
         while (!GameStateManager.player.GetComponent<PlayerControls>().isGrounded)
             yield return null;
         //Debug.Log("Player is grounded, proceeding...");
@@ -73,12 +133,10 @@ public class GameStateManager : MonoBehaviour {
         //Debug.Log("Fade In");
         FadingIn = true;
         FadeImage.CrossFadeColor(new Color(0, 0, 0, 0), 1f, false, true);
-        player.GetComponent<PlayerControls>().canControl = false;
+        PlayerControls.canControl = false;
         yield return new WaitForSeconds(1f);
-        player.GetComponent<PlayerControls>().canControl = true;
+        PlayerControls.canControl = true;
         FadingIn = false;
-
-        
     }
 
     public static IEnumerator FadeOut()
@@ -86,9 +144,9 @@ public class GameStateManager : MonoBehaviour {
         Debug.Log("Fade Out");
         FadingOut = true;
         FadeImage.CrossFadeColor(new Color(0, 0, 0, 1), 1f, false, true);
-        player.GetComponent<PlayerControls>().canControl = false;
+        PlayerControls.canControl = false;
         yield return new WaitForSeconds(1f);
-        player.GetComponent<PlayerControls>().canControl = true;
+        PlayerControls.canControl = true;
         FadingOut = false;
     }
 

@@ -35,7 +35,7 @@ public class SoccerSequenceManager : MonoBehaviour {
     {
         if (ballShot)
         {
-            playerScript.canControl = false;
+            PlayerControls.canControl = false;
         }
 
         if (ballDisappeared)
@@ -54,7 +54,7 @@ public class SoccerSequenceManager : MonoBehaviour {
             if (soccerKid != null && !soccerKidScript.GetComponent<Renderer>().isVisible)
             {
                 Destroy(soccerKid.gameObject);
-                playerScript.canControl = true;
+                PlayerControls.canControl = true;
                 waitingForDialogueEnd = false;
                 Debug.Log("Finished Sequence Soccer");
             }
