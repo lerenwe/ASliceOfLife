@@ -51,6 +51,8 @@ public class PlayerControls : MonoBehaviour {
     // Update is called once per frame
     void FixedUpdate()
     {
+        CheckIfGrounded();
+
         if (canControl)
         {
             Move();
@@ -76,12 +78,10 @@ public class PlayerControls : MonoBehaviour {
         }
     }
 
-    void Move ()
+    void CheckIfGrounded ()
     {
-        moveDirection = (new Vector2(Input.GetAxisRaw("Horizontal"), 0)); //This lines makes sure that if there's no input, the player will stand still.
-
         RaycastHit2D hit = Physics2D.Raycast(transform.position, -Vector2.up, distToGround + 0.3f, groundLayer);
-        RaycastHit2D hitLeft = Physics2D.Raycast(new Vector2 (transform.position.x - boxCollider.bounds.extents.x - .1f, transform.position.y), -Vector2.up, distToGround + 0.3f, groundLayer);
+        RaycastHit2D hitLeft = Physics2D.Raycast(new Vector2(transform.position.x - boxCollider.bounds.extents.x - .1f, transform.position.y), -Vector2.up, distToGround + 0.3f, groundLayer);
         RaycastHit2D hitRight = Physics2D.Raycast(new Vector2(transform.position.x + boxCollider.bounds.extents.x + .1f, transform.position.y), -Vector2.up, distToGround + 0.3f, groundLayer);
 
         RaycastHit2D[] groundTests = new RaycastHit2D[3];
@@ -93,6 +93,7 @@ public class PlayerControls : MonoBehaviour {
         {
             if (a_hit.collider != null)
             {
+                Debug.Log("RAYCAST GROUND HIT SOMETHING");
                 if (a_hit.transform.CompareTag("Ground"))
                 {
                     isGrounded = true;
@@ -124,6 +125,13 @@ public class PlayerControls : MonoBehaviour {
                 isGrounded = false;
             }
         }
+    }
+
+    void Move ()
+    {
+        moveDirection = (new Vector2(Input.GetAxisRaw("Horizontal"), 0)); //This lines makes sure that if there's no input, the player will stand still.
+
+
 
         if (!isGrounded)
             moveDirection = Vector2.zero;
