@@ -13,7 +13,8 @@ public class subSceneExit : MonoBehaviour {
     [HideInInspector]
     public bool playerIsTouchingExit = false;
 
-    bool preRequisitesMatch = false;
+    [HideInInspector]
+    public bool preRequisitesMatch = false;
 
     [SerializeField]
     bool dontTeleportOnExit = false;
@@ -33,7 +34,7 @@ public class subSceneExit : MonoBehaviour {
     [SerializeField]
     GameObject NewTargetPoint;
 
-    [Header("Change a subScene background when trigered")]
+    [Header("Change a subScene background when triggered")]
     [SerializeField]
     BackGroundChangeReceptor targetBackGroundChangeScript;
     [SerializeField]

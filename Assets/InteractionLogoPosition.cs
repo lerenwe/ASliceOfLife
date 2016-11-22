@@ -11,8 +11,8 @@ public class InteractionLogoPosition : MonoBehaviour {
     Image image;
 
 	// Use this for initialization
-	void Start () {
-
+	void Start ()
+    {
         Player = GameObject.Find("Player");
         playerSprite = Player.GetComponent<SpriteRenderer>();
 

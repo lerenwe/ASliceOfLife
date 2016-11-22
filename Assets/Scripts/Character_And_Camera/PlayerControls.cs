@@ -158,7 +158,7 @@ public class PlayerControls : MonoBehaviour {
 
     void OnTriggerEnter2D (Collider2D hit)
     {
-        if (hit.CompareTag ("Exit"))
+        if (hit.CompareTag ("Exit") && !hit.GetComponent<subSceneExit>().touchToExit && hit.GetComponent<subSceneExit>().preRequisitesMatch)
         {
             Debug.Log("Overlapping Exit");
             interactLogo.gameObject.SetActive (true);
