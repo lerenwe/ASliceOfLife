@@ -5,6 +5,8 @@ public class NPC : MonoBehaviour {
 
     #region Controls Variables
     public float speedMultiplier = 5f;
+    public float followDelayReaction = .5f;
+    float timerForDelayReaction = 0;
 
     [HideInInspector]
     public Vector3 moveDirection;
@@ -76,11 +78,17 @@ public class NPC : MonoBehaviour {
 
             if (distToTarget > towardPlayerOffset)
             {
-                moveDirection = Vector3.Normalize(new Vector3(player.transform.position.x - transform.position.x, 0, 0));
-                onDestinationPoint = false;
+                timerForDelayReaction += Time.deltaTime;
+
+                if (timerForDelayReaction > followDelayReaction)
+                {
+                    moveDirection = Vector3.Normalize(new Vector3(player.transform.position.x - transform.position.x, 0, 0));
+                    onDestinationPoint = false;
+                }
             }
             else
             {
+                timerForDelayReaction = 0;
                 moveDirection = Vector3.zero;
                 onDestinationPoint = true;
             }
