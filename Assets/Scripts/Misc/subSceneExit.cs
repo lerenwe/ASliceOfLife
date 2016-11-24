@@ -75,6 +75,24 @@ public class subSceneExit : MonoBehaviour {
         #endregion
     }
 
+    public void UpdatePreRequisiteStatus ()
+    {
+        int countChoiceCheck = 0;
+        foreach (Choice choice in preRequisiteChoices)
+        {
+            if ((choice.ChoiceMade == true && choiceLoader.everyChoices.choices[countChoiceCheck].ChoiceMade == choice.ChoiceMade) || choice.ChoiceMade == false)
+            {
+                preRequisitesMatch = true;
+            }
+            else
+            {
+                preRequisitesMatch = false;
+                break;
+            }
+            countChoiceCheck++;
+        }
+    }
+
     // Update is called once per frame
     void Update ()
     {
@@ -82,22 +100,8 @@ public class subSceneExit : MonoBehaviour {
         {
             Debug.Log("Trying to exit...");
 
-            int countChoiceCheck = 0;
-
-            foreach (Choice choice in preRequisiteChoices)
-            {
-                if ( (choice.ChoiceMade == true && choiceLoader.everyChoices.choices[countChoiceCheck].ChoiceMade == choice.ChoiceMade) || choice.ChoiceMade == false)
-                {
-                    preRequisitesMatch = true;
-                }
-                else
-                {
-                    preRequisitesMatch = false;
-                    break;
-                }
-                countChoiceCheck++;
-            }
-
+            UpdatePreRequisiteStatus();
+           
             if (preRequisitesMatch)
             {
                 Debug.Log(gameObject.name + "'s prerequisites are matching.");
@@ -105,8 +109,6 @@ public class subSceneExit : MonoBehaviour {
             }
             else
                 Debug.Log(gameObject.name + "'s prerequisites are NOT matching.");
-
-            countChoiceCheck = 0;
         }
 	}
 
