@@ -41,7 +41,7 @@ public class GameStateManager : MonoBehaviour {
         {
             titleLogo = transform.FindChild("TitleLogo").GetComponent<Image>();
             StartCoroutine(FadeInAnyPicture(titleLogo));
-
+            SoundManager.Intro = true;
             player.GetComponent<Animator>().SetTrigger("Sleep");
 
         }
