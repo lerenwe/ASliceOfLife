@@ -4,6 +4,8 @@ using UnityEngine.UI;
 
 public class WakeUpSequence : MonoBehaviour {
 
+
+    //TODO : Set up the real animations
     bool wokeUp = false;
     GameObject player;
     Image titleLogo;
@@ -30,6 +32,7 @@ public class WakeUpSequence : MonoBehaviour {
             if (titleLogo.canvasRenderer.GetColor().a <= .1f && (player.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).IsName("Idle")))
             {
                 PlayerControls.canControl = true;
+                SoundManager.WakeUp = true;
                 wokeUp = true;
             }
         }

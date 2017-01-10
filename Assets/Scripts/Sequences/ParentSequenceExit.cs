@@ -12,7 +12,13 @@ public class ParentSequenceExit : subSceneExit
 
     public override IEnumerator Exit()
     {
+            if (destinationPoint.name == "Entry_Street")
+            {
+                SoundManager.OutsideAmbiance = true;
+            }
+
             return base.Exit();
+
             parentSequenceScript = BedRoomManager.GetComponent<TalkToParentsSequence>();
 
             if (parentSequenceScript.triggeredSequence)

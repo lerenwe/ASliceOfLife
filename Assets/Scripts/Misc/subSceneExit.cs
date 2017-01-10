@@ -179,6 +179,16 @@ public class subSceneExit : MonoBehaviour {
 
             GameStateManager.player.transform.position = destinationPoint.transform.position;
 
+            if(destinationPoint.name == "Entry_street") //If we enter the streets
+            {
+                SoundManager.OutsideAmbiance = true;
+            }
+
+            if(this.name == "Exit_Stadium" || this.name == "Exit_OutsideMain") //If we exit the street scene
+            {
+                SoundManager.OutsideAmbiance = false;
+            }
+
             StartCoroutine(GameStateManager.FadeIn());
         }
     }
