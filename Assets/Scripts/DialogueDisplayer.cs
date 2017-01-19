@@ -121,7 +121,7 @@ public class DialogueDisplayer : MonoBehaviour {
 
     //Must be called each time we need to clear the bubble (Most of the time, it's to prepare the next line to be displayed).
     //This will also immediately start to display the next line of dialogue.
-    public void ResetDialogueBubble ()
+    public void ResetDialogueBubble (bool ChoiceMode)
     {
         GameObject[] everySingleWord = GameObject.FindGameObjectsWithTag("DialogueWord");
 
@@ -129,7 +129,7 @@ public class DialogueDisplayer : MonoBehaviour {
             GameObject.Destroy(word);
 
         firstWordMustSpawn = true;
-        DisplayNewText(textToDisplay);
+        DisplayNewText(textToDisplay, ChoiceMode);
         iterator = 0;
 
         finishedLine = false;
@@ -174,8 +174,13 @@ public class DialogueDisplayer : MonoBehaviour {
 	}
     
     //This method actually separate each words of the line into a string array that will be used to spawn each word's gameObject individually
-    public void DisplayNewText(string newText)
+    public void DisplayNewText(string newText, bool ChoiceMode)
     {
-        currentWordsToDisplay = textToDisplay.Split(' ');
+        if(!ChoiceMode)
+            currentWordsToDisplay = textToDisplay.Split(' ');
+        else
+        {
+            currentWordsToDisplay = textToDisplay.Split('#');
+        }
     }
 }

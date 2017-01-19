@@ -24,6 +24,7 @@ public class Dialogue : MonoBehaviour {
         bool dialogueStarted = false;
         bool lastLine = false;
         bool firstInit = true;
+        bool waitingForChoice = false;
     #endregion
 
     #region External objects & components
@@ -73,7 +74,8 @@ public class Dialogue : MonoBehaviour {
         {
             if (dialogueTriggered || (dialogueInProgress && !lastLine &&Input.GetButtonDown("Submit"))) //Display the first line & the next one when "Next Line" is pressed
             {
-                dialogueDisplayer.DisplayNewText(dialogueDisplayer.textToDisplay);
+                Debug.Log("Waiting for choice is " + waitingForChoice);
+                dialogueDisplayer.DisplayNewText(dialogueDisplayer.textToDisplay, waitingForChoice);
             }
 
             //All of this stuff is to place the bubble correctly
@@ -158,45 +160,56 @@ public class Dialogue : MonoBehaviour {
             if (dialogueDisplayer != null)
             {
                 //Skip line if it's being in the process of getting displayed and player pressed "Next Line" Button
-                if (!dialogueClosed &&Input.GetButtonDown("Submit") && !dialogueDisplayer.finishedLine) 
+                if (!dialogueClosed && Input.GetButtonDown("Submit") && !dialogueDisplayer.finishedLine) 
                 {
                     dialogueDisplayer.skipThisLine = true;
                 }
                 //But if the line has finished being displayed, 
                 else if (dialogueTriggered || (dialogueInProgress && !lastLine &&Input.GetButtonDown("Submit") && dialogueDisplayer.finishedLine)) 
                 {
-                    //Then we finally display the text on top of all that
-                    string text = story.Continue().Trim();
+                    //Then we finally display the text on top of all that, except if we're inside a choice
+                    string text = "Text Display Error. Check Dialogue.cs";
 
-                    //Parsing who's speaking right now
-                    string firstWord = text.Split(':').First();
-
-                    foreach (GameObject character in dialogueCharacters)
+                    if (story.canContinue)
                     {
-                        if (firstWord.Equals(character.transform.name))
+                        text = story.Continue().Trim();
+
+                        //Parsing who's speaking right now
+                        string firstWord = text.Split(':').First(); //TODO: Optimization : We can avoid this when we're displaying a choice.
+
+                        foreach (GameObject character in dialogueCharacters)
                         {
-                            characterCurrentlySpeaking = character;
-                            break;
+                            if (firstWord.Equals(character.transform.name))
+                            {
+                                characterCurrentlySpeaking = character;
+                                break;
+                            }
+
+                            if (characterCurrentlySpeaking == null)
+                            {
+                                Debug.LogError("None of the character's gameObject name matches the name ''" + firstWord + "'' in the Ink script. Please check that the names perfectly matches, including case.");
+                            }
                         }
 
-                        if (characterCurrentlySpeaking == null)
-                        {
-                            Debug.LogError("None of the character's gameObject name matches the name ''" + firstWord + "'' in the Ink script. Please check that the names perfectly matches, including case.");
-                        }
+                        //Let's then remove the character name from the text to display
+                        text = text.Replace(characterCurrentlySpeaking.transform.name + ":", "");
+                        dialogueDisplayer.textToDisplay = text.Trim();
                     }
-
-                    //Let's then remove the character name from the text to display
-                    text = text.Replace(characterCurrentlySpeaking.transform.name + ":", "");
-                    dialogueDisplayer.textToDisplay = text.Trim();
+                    //else if (story.currentChoices.Count > 0)
+                        
 
                     //At this point we mark the dialogue as in progress. Triggered is used only at the exact moment the dialogue is triggered.
-                    dialogueDisplayer.ResetDialogueBubble();
+                    dialogueDisplayer.ResetDialogueBubble(waitingForChoice);
                     dialogueTriggered = false;
                     dialogueInProgress = true;
 
-                    if(!story.canContinue)
+                    if (!story.canContinue && story.currentChoices.Count <= 0)
                     {
                         lastLine = true; //We reached the last line, the dialogue is now over and ready to be closed
+                    }
+                    else if (!story.canContinue && story.currentChoices.Count > 0)
+                    {
+                        DisplayChoices(ref text);
                     }
                 }
                 //Close dialogue when we reached the last line and the player pressed the "Next Line" key
@@ -218,13 +231,55 @@ public class Dialogue : MonoBehaviour {
                         Destroy(word);
                     }
 
-                    dialogueDisplayer.ResetDialogueBubble();
+                    dialogueDisplayer.ResetDialogueBubble(false);
 
                     dialogueDisplayObject.SetActive(false);
                     //dialogueClosed = true;
                 }
             }
         }
+    }
+
+    void DisplayChoices (ref string text) //TODO : Cleanup : Not sure if the ref is needed after all...
+    {
+        text = charactersName[0].Trim() + ":";
+
+        bool first = true;
+        foreach (Ink.Runtime.Choice choice in story.currentChoices)
+        {
+            if (!first)
+                text += "#"; //TODO : FIX THIS FIRST !!! For some reason, if we put the "#" in front of the first line, it works, but dunno why...
+
+            text += choice.text.Trim();
+
+            first = false;
+        }
+
+        dialogueDisplayer.textToDisplay = text.Trim();
+        waitingForChoice = true;
+
+        //Parsing who's speaking right now
+        string firstWord = text.Split(':').First(); //TODO: Optimization : We can avoid this when we're displaying a choice.
+
+        foreach (GameObject character in dialogueCharacters)
+        {
+            if (firstWord.Equals(character.transform.name))
+            {
+                characterCurrentlySpeaking = character;
+                break;
+            }
+
+            if (characterCurrentlySpeaking == null)
+            {
+                Debug.LogError("None of the character's gameObject name matches the name ''" + firstWord + "'' in the Ink script. Please check that the names perfectly matches, including case.");
+            }
+        }
+
+        //Let's then remove the character name from the text to display
+        text = text.Replace(characterCurrentlySpeaking.transform.name + ":", "");
+        dialogueDisplayer.textToDisplay = text.Trim();
+
+        Debug.Log("Display choice called and completed");
     }
 
     void ResetDialogue() //Reset this dialogue when closed, in case it must be triggered again later
