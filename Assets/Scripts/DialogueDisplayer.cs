@@ -1,8 +1,10 @@
 ﻿using Ink.Runtime;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Linq;
 
 public class DialogueDisplayer : MonoBehaviour {
 
@@ -12,7 +14,7 @@ public class DialogueDisplayer : MonoBehaviour {
         [HideInInspector] public bool skipThisLine = false;
 
         string displayedText = null;
-        string[] currentWordsToDisplay;
+        List<string> currentWordsToDisplay = new List<string>();
 
         //Positioning & Line status
         [HideInInspector] public RectTransform previousWordRectTransform;
@@ -23,6 +25,7 @@ public class DialogueDisplayer : MonoBehaviour {
         [HideInInspector] public bool m_bReachedLineEnd = false;
         [HideInInspector] public bool finishedLine = false;
         bool firstWordMustSpawn = true;
+        bool wordWrapDirectlyOnComponent = false;
 
         float targetYPos;
     #endregion
@@ -109,8 +112,20 @@ public class DialogueDisplayer : MonoBehaviour {
         WordNextToFirstTest currentWordScript = currentWord.GetComponent<WordNextToFirstTest>();
         currentWordScript.parentDialogue = this;
 
+        if (wordWrapDirectlyOnComponent)
+        {
+            currentWordScript.customWordWrap = false;
+            currentWord.GetComponent<Text>().horizontalOverflow = HorizontalWrapMode.Wrap; //TODO : IMPORTANT : The text box should be resized for the bubble, or vice-versa, dunno, take a decision!
+            //currentWord.GetComponent<Text>().verticalOverflow = VerticalWrapMode.;
+            wordWrapDirectlyOnComponent = false; //TODO : This is actually a placeHolder, we should keep the horizontalOverflow in wrap mode for the other words, but still use the customWordWrap as true, else, the other choice will appear
+                                                //right next to the first one =/
+        }
+
         if (isFirstWord) //We have to mark the word if it is the first one to spawn for this line, as its position will drive the rest of the words' positions.
+        {
             currentWordScript.firstWord = true;
+            Debug.Log("''" + currentWordScript.name + "''" + " is the first word for this sentence");
+        }
         else
         {
             currentWordScript.firstWord = false;
@@ -153,7 +168,7 @@ public class DialogueDisplayer : MonoBehaviour {
        nextCharacterTimer += Time.deltaTime;
 
         //Each time the Timer is greater than the set display speed rate, we create the next word to be displayed.
-        if (nextCharacterTimer > displaySpeedRate && iterator < currentWordsToDisplay.Length)
+        if (nextCharacterTimer > displaySpeedRate && iterator < currentWordsToDisplay.Count)
         {
             GameObject spawnedNewWord = SpawnWord();
             setWordStartPos(firstWordMustSpawn, spawnedNewWord);
@@ -166,7 +181,7 @@ public class DialogueDisplayer : MonoBehaviour {
         }
 
         //If the iterator is greater than the number of words to display, then we're done with this line, let's prepare ourselves to display the next one (Or to close the dialogue...)
-        if (iterator >= currentWordsToDisplay.Length)
+        if (iterator >= currentWordsToDisplay.Count)
         {
             finishedLine = true;
             NextLineLogo.SetActive(true);
@@ -176,11 +191,18 @@ public class DialogueDisplayer : MonoBehaviour {
     //This method actually separate each words of the line into a string array that will be used to spawn each word's gameObject individually
     public void DisplayNewText(string newText, bool ChoiceMode)
     {
-        if(!ChoiceMode)
-            currentWordsToDisplay = textToDisplay.Split(' ');
+        if (!ChoiceMode)
+        {
+            currentWordsToDisplay = textToDisplay.Split(' ').ToList<String>();
+            wordWrapDirectlyOnComponent = false;
+        }
         else
         {
-            currentWordsToDisplay = textToDisplay.Split('#');
+            currentWordsToDisplay = textToDisplay.Split('#').ToList<String>();
+            wordWrapDirectlyOnComponent = true;
         }
+
+        if (currentWordsToDisplay[0] == " " || currentWordsToDisplay[0] == "")
+            currentWordsToDisplay.RemoveAt(0);
     }
 }

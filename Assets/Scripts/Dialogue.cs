@@ -184,11 +184,11 @@ public class Dialogue : MonoBehaviour {
                                 characterCurrentlySpeaking = character;
                                 break;
                             }
+                        }
 
-                            if (characterCurrentlySpeaking == null)
-                            {
-                                Debug.LogError("None of the character's gameObject name matches the name ''" + firstWord + "'' in the Ink script. Please check that the names perfectly matches, including case.");
-                            }
+                        if (characterCurrentlySpeaking == null)
+                        {
+                            Debug.LogError("None of the character's gameObject name matches the name ''" + firstWord + "'' in the Ink script. Please check that the names perfectly matches, including case.");
                         }
 
                         //Let's then remove the character name from the text to display
@@ -211,6 +211,8 @@ public class Dialogue : MonoBehaviour {
                     {
                         DisplayChoices(ref text);
                     }
+
+                    Debug.Log("NEXT LINE TO DISPLAY = " + text);
                 }
                 //Close dialogue when we reached the last line and the player pressed the "Next Line" key
                 else if (dialogueStarted && lastLine &&Input.GetButtonDown("Submit") && dialogueDisplayer.finishedLine) 
@@ -247,7 +249,7 @@ public class Dialogue : MonoBehaviour {
         bool first = true;
         foreach (Ink.Runtime.Choice choice in story.currentChoices)
         {
-            if (!first)
+            //if (!first)
                 text += "#"; //TODO : FIX THIS FIRST !!! For some reason, if we put the "#" in front of the first line, it works, but dunno why...
 
             text += choice.text.Trim();
