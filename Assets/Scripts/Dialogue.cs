@@ -25,6 +25,7 @@ public class Dialogue : MonoBehaviour {
         bool lastLine = false;
         bool firstInit = true;
         bool waitingForChoice = false;
+        bool displayChoiceNext = false;
     #endregion
 
     #region External objects & components
@@ -162,6 +163,7 @@ public class Dialogue : MonoBehaviour {
                 //Skip line if it's being in the process of getting displayed and player pressed "Next Line" Button
                 if (!dialogueClosed && Input.GetButtonDown("Submit") && !dialogueDisplayer.finishedLine) 
                 {
+                    Debug.Log("Skipped line");
                     dialogueDisplayer.skipThisLine = true;
                 }
                 //But if the line has finished being displayed, 
@@ -194,23 +196,34 @@ public class Dialogue : MonoBehaviour {
                         //Let's then remove the character name from the text to display
                         text = text.Replace(characterCurrentlySpeaking.transform.name + ":", "");
                         dialogueDisplayer.textToDisplay = text.Trim();
+
+                        //At this point we mark the dialogue as in progress. Triggered is used only at the exact moment the dialogue is triggered.
+                        dialogueDisplayer.ResetDialogueBubble(waitingForChoice);
+                        dialogueTriggered = false;
+                        dialogueInProgress = true;
                     }
                     //else if (story.currentChoices.Count > 0)
                         
 
-                    //At this point we mark the dialogue as in progress. Triggered is used only at the exact moment the dialogue is triggered.
-                    dialogueDisplayer.ResetDialogueBubble(waitingForChoice);
-                    dialogueTriggered = false;
-                    dialogueInProgress = true;
 
+
+                    if (displayChoiceNext)
+                    {
+                        displayChoiceNext = false;
+                        Debug.LogWarning("Reached a choice in the dialogue.");
+                        DisplayChoices(ref text);
+                    }
+                    else
                     if (!story.canContinue && story.currentChoices.Count <= 0)
                     {
                         lastLine = true; //We reached the last line, the dialogue is now over and ready to be closed
                     }
                     else if (!story.canContinue && story.currentChoices.Count > 0)
                     {
-                        DisplayChoices(ref text);
+                        displayChoiceNext = true;
                     }
+
+
 
                     Debug.Log("NEXT LINE TO DISPLAY = " + text);
                 }
@@ -260,6 +273,7 @@ public class Dialogue : MonoBehaviour {
         dialogueDisplayer.textToDisplay = text.Trim();
         waitingForChoice = true;
 
+        //TODO: IMPORTANT : From here, we can factorize all this stuff with the display of a regular line. Plz. Thx.
         //Parsing who's speaking right now
         string firstWord = text.Split(':').First(); //TODO: Optimization : We can avoid this when we're displaying a choice.
 
@@ -280,6 +294,11 @@ public class Dialogue : MonoBehaviour {
         //Let's then remove the character name from the text to display
         text = text.Replace(characterCurrentlySpeaking.transform.name + ":", "");
         dialogueDisplayer.textToDisplay = text.Trim();
+
+        //At this point we mark the dialogue as in progress. Triggered is used only at the exact moment the dialogue is triggered.
+        dialogueDisplayer.ResetDialogueBubble(waitingForChoice);
+        dialogueTriggered = false;
+        dialogueInProgress = true;
 
         Debug.Log("Display choice called and completed");
     }

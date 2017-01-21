@@ -98,7 +98,7 @@ public class WordNextToFirstTest : MonoBehaviour {
         float targetXPos;
         float targetYPos;
 
-        Debug.Log("Broke line at word : " + this.name);
+        //Debug.Log("Broke line at word : " + this.name);
 
         if (!brokeLineOnce)
         {

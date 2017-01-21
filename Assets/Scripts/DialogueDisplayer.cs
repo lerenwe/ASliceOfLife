@@ -112,22 +112,22 @@ public class DialogueDisplayer : MonoBehaviour {
         WordNextToFirstTest currentWordScript = currentWord.GetComponent<WordNextToFirstTest>();
         currentWordScript.parentDialogue = this;
 
-        if (wordWrapDirectlyOnComponent)
-        {
-            currentWordScript.customWordWrap = false;
-            currentWord.GetComponent<Text>().horizontalOverflow = HorizontalWrapMode.Wrap; //TODO : IMPORTANT : The text box should be resized for the bubble, or vice-versa, dunno, take a decision!
-            //currentWord.GetComponent<Text>().verticalOverflow = VerticalWrapMode.;
-            wordWrapDirectlyOnComponent = false; //TODO : This is actually a placeHolder, we should keep the horizontalOverflow in wrap mode for the other words, but still use the customWordWrap as true, else, the other choice will appear
-                                                //right next to the first one =/
-        }
-
         if (isFirstWord) //We have to mark the word if it is the first one to spawn for this line, as its position will drive the rest of the words' positions.
         {
+            if (wordWrapDirectlyOnComponent)
+            {
+                currentWordScript.customWordWrap = false;
+                currentWord.GetComponent<Text>().horizontalOverflow = HorizontalWrapMode.Wrap; //TODO : IMPORTANT : The text box should be resized for the bubble, or vice-versa, dunno, take a decision!
+            }
+
             currentWordScript.firstWord = true;
-            Debug.Log("''" + currentWordScript.name + "''" + " is the first word for this sentence");
+            //Debug.Log("''" + currentWordScript.name + "''" + " is the first word for this sentence");
         }
         else
         {
+            if (wordWrapDirectlyOnComponent)
+                currentWord.GetComponent<Text>().horizontalOverflow = HorizontalWrapMode.Wrap; //TODO : IMPORTANT : The text box should be resized for the bubble, or vice-versa, dunno, take a decision!
+
             currentWordScript.firstWord = false;
             currentWordScript.previousWord = previousWordRectTransform; //This will be useful as every word that spawns after the first one will use the previously spawned word
                                                                         //position in order to place itself.
@@ -184,6 +184,7 @@ public class DialogueDisplayer : MonoBehaviour {
         if (iterator >= currentWordsToDisplay.Count)
         {
             finishedLine = true;
+            Debug.LogWarning("Line finished");
             NextLineLogo.SetActive(true);
         }
 	}
