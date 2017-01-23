@@ -259,15 +259,10 @@ public class Dialogue : MonoBehaviour {
     {
         text = charactersName[0].Trim() + ":";
 
-        bool first = true;
         foreach (Ink.Runtime.Choice choice in story.currentChoices)
         {
-            //if (!first)
-                text += "#"; //TODO : FIX THIS FIRST !!! For some reason, if we put the "#" in front of the first line, it works, but dunno why...
-
+            text += "#";
             text += choice.text.Trim();
-
-            first = false;
         }
 
         dialogueDisplayer.textToDisplay = text.Trim();

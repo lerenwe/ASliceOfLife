@@ -20,7 +20,7 @@ public class WordNextToFirstTest : MonoBehaviour {
     bool secondUpdateCall = false;
     bool begin = true;
     bool brokeLineOnce = false;
-    public bool customWordWrap = true;
+    [HideInInspector] public bool customWordWrap = true;
 
 
 
@@ -72,6 +72,8 @@ public class WordNextToFirstTest : MonoBehaviour {
 
             mahRectTransform.position = startPos;
 
+
+
             begin = false;
         }
             secondUpdateCall = true;
@@ -102,13 +104,10 @@ public class WordNextToFirstTest : MonoBehaviour {
 
         if (!brokeLineOnce)
         {
-            Vector3[] corners = new Vector3[4];
-            parentDialogue.bubbleBackRectTransform.GetWorldCorners(corners);
-
-            targetXPos = parentDialogue.firstWordFromPreviousLine.position.x - (parentDialogue.firstWordFromPreviousLine.rect.width / 2) * parentDialogue.canvas.scaleFactor 
+            targetXPos = parentDialogue.firstWordFromPreviousLine.position.x - (parentDialogue.firstWordFromPreviousLine.rect.width / 2) * parentDialogue.canvas.scaleFactor
                             + (mahRectTransform.rect.width / 2) * parentDialogue.canvas.scaleFactor;
 
-            targetYPos = parentDialogue.firstWordFromPreviousLine.position.y - (mahRectTransform.rect.height / 2) * parentDialogue.canvas.scaleFactor 
+            targetYPos = parentDialogue.firstWordFromPreviousLine.position.y - (mahRectTransform.rect.height / 2) * parentDialogue.canvas.scaleFactor
                             - parentDialogue.spaceBetweenLines * parentDialogue.canvas.scaleFactor;
         }
         else //If we already broke this line, we return the same value, we won't have to change the position of the word

@@ -25,9 +25,11 @@ public class DialogueDisplayer : MonoBehaviour {
         [HideInInspector] public bool m_bReachedLineEnd = false;
         [HideInInspector] public bool finishedLine = false;
         bool firstWordMustSpawn = true;
-        bool wordWrapDirectlyOnComponent = false;
+        bool wordWrapChoiceMode = false;
 
         float targetYPos;
+        List<GameObject> allSpawnedWords = new List<GameObject>();
+        Text copy;
     #endregion
 
     #region External Components
@@ -114,7 +116,7 @@ public class DialogueDisplayer : MonoBehaviour {
 
         if (isFirstWord) //We have to mark the word if it is the first one to spawn for this line, as its position will drive the rest of the words' positions.
         {
-            if (wordWrapDirectlyOnComponent)
+            if (wordWrapChoiceMode)
             {
                 currentWordScript.customWordWrap = false;
                 currentWord.GetComponent<Text>().horizontalOverflow = HorizontalWrapMode.Wrap; //TODO : IMPORTANT : The text box should be resized for the bubble, or vice-versa, dunno, take a decision!
@@ -125,13 +127,18 @@ public class DialogueDisplayer : MonoBehaviour {
         }
         else
         {
-            if (wordWrapDirectlyOnComponent)
+            if (wordWrapChoiceMode)
+            {
+                currentWordScript.customWordWrap = true;
                 currentWord.GetComponent<Text>().horizontalOverflow = HorizontalWrapMode.Wrap; //TODO : IMPORTANT : The text box should be resized for the bubble, or vice-versa, dunno, take a decision!
+            }
 
             currentWordScript.firstWord = false;
             currentWordScript.previousWord = previousWordRectTransform; //This will be useful as every word that spawns after the first one will use the previously spawned word
                                                                         //position in order to place itself.
         }
+
+
     }
 
     //Must be called each time we need to clear the bubble (Most of the time, it's to prepare the next line to be displayed).
@@ -154,6 +161,8 @@ public class DialogueDisplayer : MonoBehaviour {
 	// Update is called once per frame
 	void Update ()
     {
+
+
         //This is used when the player press "Next Line" when the line is still being in the process of being displayed
         if (skipThisLine && !finishedLine)
         {
@@ -171,6 +180,7 @@ public class DialogueDisplayer : MonoBehaviour {
         if (nextCharacterTimer > displaySpeedRate && iterator < currentWordsToDisplay.Count)
         {
             GameObject spawnedNewWord = SpawnWord();
+            allSpawnedWords.Add(spawnedNewWord);
             setWordStartPos(firstWordMustSpawn, spawnedNewWord);
             firstWordMustSpawn = false;
             spawnedNewWord.transform.SetParent(bubbleBackRectTransform.transform);
@@ -195,12 +205,57 @@ public class DialogueDisplayer : MonoBehaviour {
         if (!ChoiceMode)
         {
             currentWordsToDisplay = textToDisplay.Split(' ').ToList<String>();
-            wordWrapDirectlyOnComponent = false;
+            wordWrapChoiceMode = false;
         }
         else
         {
             currentWordsToDisplay = textToDisplay.Split('#').ToList<String>();
-            wordWrapDirectlyOnComponent = true;
+            wordWrapChoiceMode = true;
+
+            //Resizing the bubble for the long choice lines
+            if (wordWrapChoiceMode)
+            {
+                System.Type type = wordPrefab.GetComponent<Text>().GetType();
+                copy = this.gameObject.AddComponent(type) as Text;
+                // Copied fields can be restricted with BindingFlags
+                System.Reflection.FieldInfo[] fields = type.GetFields();
+                foreach (System.Reflection.FieldInfo field in fields)
+                {
+                    field.SetValue(copy, field.GetValue(wordPrefab.GetComponent <Text>()));
+                }
+
+                if (wordWrapChoiceMode)
+                {
+                    float longestChoiceSize = 0f;
+
+                    foreach (String word in currentWordsToDisplay)
+                    {
+                        copy.text = word;
+                        copy.resizeTextForBestFit = true; //TODO: URGENT: Almost there for bubble resize...
+
+                        Canvas.ForceUpdateCanvases();
+
+                        if (longestChoiceSize == 0f)
+                            longestChoiceSize = copy.rectTransform.rect.width;
+                        else if (longestChoiceSize < copy.rectTransform.rect.width) //TODO: For god sake, optimize this, you lazy fuck, too much GetComponent calls...
+                        {
+                            longestChoiceSize = copy.rectTransform.rect.width;
+                        }
+                    }
+
+                    if (longestChoiceSize != 0f)
+                    {
+                        longestChoiceSize *= canvas.scaleFactor;
+                        bubbleBackRectTransform.sizeDelta = new Vector2(longestChoiceSize, bubbleBackRectTransform.rect.height);
+                    }
+
+                    Destroy(copy);
+                }
+
+
+
+
+            }
         }
 
         if (currentWordsToDisplay[0] == " " || currentWordsToDisplay[0] == "")
