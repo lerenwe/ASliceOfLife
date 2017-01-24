@@ -21,6 +21,7 @@ public class WordNextToFirstTest : MonoBehaviour {
     bool begin = true;
     bool brokeLineOnce = false;
     [HideInInspector] public bool customWordWrap = true;
+    [HideInInspector] public bool choiceMode = false;
 
 
 
@@ -61,8 +62,10 @@ public class WordNextToFirstTest : MonoBehaviour {
             Vector2 targetStartPos = new Vector2(targetxPos, targetyPos);
 
             //Let's then check if our target position for this word gets out of the bubble, if yes, we'll break the line now
-            if (IsLineOverflowingHorizontally(targetxPos, targetyPos) && customWordWrap)
+            if ( (IsLineOverflowingHorizontally(targetxPos, targetyPos) && customWordWrap)
+                || (customWordWrap && choiceMode) )
             {
+
                 transform.SetParent(parentDialogue.bubbleBackRectTransform.transform);
                 startPos = BreakLine();
             }
@@ -104,6 +107,7 @@ public class WordNextToFirstTest : MonoBehaviour {
 
         if (!brokeLineOnce)
         {
+            Debug.Log("Broke line");
             targetXPos = parentDialogue.firstWordFromPreviousLine.position.x - (parentDialogue.firstWordFromPreviousLine.rect.width / 2) * parentDialogue.canvas.scaleFactor
                             + (mahRectTransform.rect.width / 2) * parentDialogue.canvas.scaleFactor;
 

@@ -28,8 +28,10 @@ public class DialogueDisplayer : MonoBehaviour {
         bool wordWrapChoiceMode = false;
 
         float targetYPos;
+
+        //The followings are used in case we are displaying a choice.
         List<GameObject> allSpawnedWords = new List<GameObject>();
-        Text copy;
+        bool recalculateBubbleSizeForChoices = false;
     #endregion
 
     #region External Components
@@ -130,6 +132,7 @@ public class DialogueDisplayer : MonoBehaviour {
             if (wordWrapChoiceMode)
             {
                 currentWordScript.customWordWrap = true;
+                currentWordScript.choiceMode = true;
                 currentWord.GetComponent<Text>().horizontalOverflow = HorizontalWrapMode.Wrap; //TODO : IMPORTANT : The text box should be resized for the bubble, or vice-versa, dunno, take a decision!
             }
 
@@ -158,10 +161,54 @@ public class DialogueDisplayer : MonoBehaviour {
         NextLineLogo.SetActive(false);
     }
 
-	// Update is called once per frame
-	void Update ()
+    int CalculateLengthOfMessage(string message)
     {
+        int totalLength = 0;
 
+        Font myFont = wordPrefab.GetComponent<Text>().font;  //chatText is my Text component
+        CharacterInfo characterInfo = new CharacterInfo();
+
+        char[] arr = message.ToCharArray();
+
+        foreach (char c in arr)
+        {
+            myFont.GetCharacterInfo(c, out characterInfo, wordPrefab.GetComponent<Text>().fontSize);
+
+            totalLength += characterInfo.advance;
+        }
+
+        return totalLength;
+    }
+
+    // Update is called once per frame
+    void Update ()
+    {
+        //Adapting the bubble back size to the longest line for the choices.
+        if (recalculateBubbleSizeForChoices) //TODO: BUGFIX: Slightly glitchy when called multiple times in a row...
+        {
+            recalculateBubbleSizeForChoices = false;
+
+            float longestChoiceSize = 0f;
+
+            foreach (String word in currentWordsToDisplay)
+            {
+                
+                float width = CalculateLengthOfMessage(word);
+
+                if (longestChoiceSize == 0f)
+                    longestChoiceSize = width;
+                else if (longestChoiceSize < width)
+                {
+                    longestChoiceSize = width;
+                }
+            }
+
+            if (longestChoiceSize != 0f)
+            {
+                longestChoiceSize *= canvas.scaleFactor;
+                bubbleBackRectTransform.sizeDelta = new Vector2(longestChoiceSize, bubbleBackRectTransform.rect.height);
+            }
+        }
 
         //This is used when the player press "Next Line" when the line is still being in the process of being displayed
         if (skipThisLine && !finishedLine)
@@ -210,55 +257,13 @@ public class DialogueDisplayer : MonoBehaviour {
         else
         {
             currentWordsToDisplay = textToDisplay.Split('#').ToList<String>();
+
+            if (currentWordsToDisplay[0] == " " || currentWordsToDisplay[0] == "")
+                currentWordsToDisplay.RemoveAt(0);
+
             wordWrapChoiceMode = true;
-
-            //Resizing the bubble for the long choice lines
-            if (wordWrapChoiceMode)
-            {
-                System.Type type = wordPrefab.GetComponent<Text>().GetType();
-                copy = this.gameObject.AddComponent(type) as Text;
-                // Copied fields can be restricted with BindingFlags
-                System.Reflection.FieldInfo[] fields = type.GetFields();
-                foreach (System.Reflection.FieldInfo field in fields)
-                {
-                    field.SetValue(copy, field.GetValue(wordPrefab.GetComponent <Text>()));
-                }
-
-                if (wordWrapChoiceMode)
-                {
-                    float longestChoiceSize = 0f;
-
-                    foreach (String word in currentWordsToDisplay)
-                    {
-                        copy.text = word;
-                        copy.resizeTextForBestFit = true; //TODO: URGENT: Almost there for bubble resize...
-
-                        Canvas.ForceUpdateCanvases();
-
-                        if (longestChoiceSize == 0f)
-                            longestChoiceSize = copy.rectTransform.rect.width;
-                        else if (longestChoiceSize < copy.rectTransform.rect.width) //TODO: For god sake, optimize this, you lazy fuck, too much GetComponent calls...
-                        {
-                            longestChoiceSize = copy.rectTransform.rect.width;
-                        }
-                    }
-
-                    if (longestChoiceSize != 0f)
-                    {
-                        longestChoiceSize *= canvas.scaleFactor;
-                        bubbleBackRectTransform.sizeDelta = new Vector2(longestChoiceSize, bubbleBackRectTransform.rect.height);
-                    }
-
-                    Destroy(copy);
-                }
-
-
-
-
+            recalculateBubbleSizeForChoices = true;
             }
         }
 
-        if (currentWordsToDisplay[0] == " " || currentWordsToDisplay[0] == "")
-            currentWordsToDisplay.RemoveAt(0);
     }
-}
