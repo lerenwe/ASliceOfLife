@@ -123,6 +123,9 @@ public class WordNextToFirstTest : MonoBehaviour {
         parentDialogue.firstWordFromPreviousLine = mahRectTransform;
         brokeLineOnce = true;
 
+		//parentDialogue.BrokeThisLineAtLeastOnce = true;
+		parentDialogue.BrokeLineNow(this.gameObject);
+
         return new Vector2(targetXPos, targetYPos);
     }
 }

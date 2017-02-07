@@ -29,6 +29,12 @@ public class DialogueDisplayer : MonoBehaviour {
 
         float targetYPos;
 
+		GameObject veryFirstWord;
+		GameObject lastWordBeforeBreak;
+		GameObject lastWord;
+		Vector2 textBlockSize = Vector2.zero;
+		bool finishedResizing = false;
+
         //The followings are used in case we are displaying a choice.
         List<GameObject> allSpawnedWords = new List<GameObject>();
         bool recalculateBubbleSizeForChoices = false;
@@ -69,6 +75,8 @@ public class DialogueDisplayer : MonoBehaviour {
     #region Misc
         int iterator = 0;
         float nextCharacterTimer;
+		public bool BrokeThisLineAtLeastOnce = false;
+		GameObject previouslySpawnedWord = null;
     #endregion
 
     // Use this for initialization
@@ -148,6 +156,9 @@ public class DialogueDisplayer : MonoBehaviour {
     //This will also immediately start to display the next line of dialogue.
     public void ResetDialogueBubble (bool ChoiceMode)
     {
+		BrokeThisLineAtLeastOnce = false;
+		textBlockSize = Vector2.zero;
+		finishedResizing = false;
         GameObject[] everySingleWord = GameObject.FindGameObjectsWithTag("DialogueWord");
 
         foreach (GameObject word in everySingleWord)
@@ -180,11 +191,19 @@ public class DialogueDisplayer : MonoBehaviour {
         return totalLength;
     }
 
+	public void BrokeLineNow (GameObject word)
+	{
+		if (!BrokeThisLineAtLeastOnce) {
+			lastWordBeforeBreak = allSpawnedWords[ allSpawnedWords.IndexOf(word) - 1 ];
+			BrokeThisLineAtLeastOnce = true;
+		}
+	}
+
     // Update is called once per frame
     void Update ()
     {
         //Adapting the bubble back size to the longest line for the choices.
-        if (recalculateBubbleSizeForChoices) //TODO: BUGFIX: Slightly glitchy when called multiple times in a row...
+        /*if (recalculateBubbleSizeForChoices) //TODO: BUGFIX: Slightly glitchy when called multiple times in a row...
         {
             recalculateBubbleSizeForChoices = false;
 
@@ -208,7 +227,16 @@ public class DialogueDisplayer : MonoBehaviour {
                 longestChoiceSize *= canvas.scaleFactor;
                 bubbleBackRectTransform.sizeDelta = new Vector2(longestChoiceSize, bubbleBackRectTransform.rect.height);
             }
-        }
+        }*/
+
+		//TODO: Okay trying to fucking resize the fucking fucker.
+		if (textBlockSize != Vector2.zero && !finishedResizing) 
+		{
+			bubbleBackRectTransform.sizeDelta = textBlockSize;
+			Debug.Log ("RESIZED BITCH");
+			//bubbleBackRectTransform.sizeDelta = new Vector2 (bubbleBackRectTransform.sizeDelta.x, textBlockSize.y + 15f);
+			finishedResizing = true;
+		}
 
         //This is used when the player press "Next Line" when the line is still being in the process of being displayed
         if (skipThisLine && !finishedLine)
@@ -221,29 +249,75 @@ public class DialogueDisplayer : MonoBehaviour {
         }
 
 
-       nextCharacterTimer += Time.deltaTime;
+       //nextCharacterTimer += Time.deltaTime;
 
         //Each time the Timer is greater than the set display speed rate, we create the next word to be displayed.
-        if (nextCharacterTimer > displaySpeedRate && iterator < currentWordsToDisplay.Count)
-        {
-            GameObject spawnedNewWord = SpawnWord();
-            allSpawnedWords.Add(spawnedNewWord);
-            setWordStartPos(firstWordMustSpawn, spawnedNewWord);
-            firstWordMustSpawn = false;
-            spawnedNewWord.transform.SetParent(bubbleBackRectTransform.transform);
-            previousWordRectTransform = spawnedNewWord.GetComponent<RectTransform>();
+		if (/*nextCharacterTimer > displaySpeedRate &&*/ iterator < currentWordsToDisplay.Count) {
+			foreach (string word in currentWordsToDisplay) 
+			{
+				GameObject spawnedNewWord = SpawnWord ();
+				allSpawnedWords.Add (spawnedNewWord);
 
-            iterator++;
-            nextCharacterTimer = 0;
-        }
+				setWordStartPos (firstWordMustSpawn, spawnedNewWord);
+				firstWordMustSpawn = false;
+				spawnedNewWord.transform.SetParent (bubbleBackRectTransform.transform);
+
+				iterator++;
+			}
+		}
 
         //If the iterator is greater than the number of words to display, then we're done with this line, let's prepare ourselves to display the next one (Or to close the dialogue...)
         if (iterator >= currentWordsToDisplay.Count)
         {
+			textBlockSize = TextBlockSize ();
             finishedLine = true;
             Debug.LogWarning("Line finished");
             NextLineLogo.SetActive(true);
         }
+	}
+
+	Vector2 TextBlockSize ()
+	{
+		float width = 0f;
+		float height = 0f;
+
+		float xMin = 0f;
+		float xMax = 0f;
+		float yMin = 0f;
+		float yMax = 0f;
+
+		foreach (GameObject word in allSpawnedWords) 
+		{
+			RectTransform rectTransform = word.GetComponent<Text> ().rectTransform;
+			Rect text = word.GetComponent<Text> ().rectTransform.rect;
+
+			if (word.transform.position.x - (text.width * canvas.scaleFactor) < xMin) 
+			{
+				xMin = word.transform.position.x - (text.width * canvas.scaleFactor);
+			}
+
+			if (word.transform.position.x + (text.width * canvas.scaleFactor) > xMax) 
+			{
+				xMax = word.transform.position.x + (text.width * canvas.scaleFactor);
+			}
+
+			if (word.transform.position.y - (text.height * canvas.scaleFactor) < yMin) 
+			{
+				yMin = word.transform.position.y - (text.height * canvas.scaleFactor);
+			}
+
+			if (word.transform.position.y + (text.height * canvas.scaleFactor) > yMax) 
+			{
+				yMax = word.transform.position.y + (text.height * canvas.scaleFactor);
+			}
+		}
+
+		width = xMax - xMin;
+		height = yMax - yMin;
+
+		Debug.LogWarning ("New optimal size for the bubble is = " + width + " x " + height);
+
+		return new Vector2 (Mathf.Abs (width), Mathf.Abs (height));
 	}
     
     //This method actually separate each words of the line into a string array that will be used to spawn each word's gameObject individually
