@@ -38,6 +38,7 @@ public class DialogueDisplayer : MonoBehaviour {
         //The followings are used in case we are displaying a choice.
         List<GameObject> allSpawnedWords = new List<GameObject>();
         bool recalculateBubbleSizeForChoices = false;
+		Color color = Color.white;
     #endregion
 
     #region External Components
@@ -107,12 +108,12 @@ public class DialogueDisplayer : MonoBehaviour {
     {
         GameObject spawnedWord = GameObject.Instantiate(wordPrefab) as GameObject;
         Text newWordText = spawnedWord.GetComponent<Text>();
-        newWordText.text += currentWordsToDisplay[iterator];
+		newWordText.text = textToDisplay;
 
-        newWordText.color = textColor;
+        //newWordText.color = textColor;
 
-        spawnedWord.transform.name = currentWordsToDisplay[iterator];
-        newWordText.text += " ";
+		spawnedWord.transform.name = textToDisplay;
+        //newWordText.text += " ";
 
         return spawnedWord;
     }
@@ -202,41 +203,6 @@ public class DialogueDisplayer : MonoBehaviour {
     // Update is called once per frame
     void Update ()
     {
-        //Adapting the bubble back size to the longest line for the choices.
-        /*if (recalculateBubbleSizeForChoices) //TODO: BUGFIX: Slightly glitchy when called multiple times in a row...
-        {
-            recalculateBubbleSizeForChoices = false;
-
-            float longestChoiceSize = 0f;
-
-            foreach (String word in currentWordsToDisplay)
-            {
-                
-                float width = CalculateLengthOfMessage(word);
-
-                if (longestChoiceSize == 0f)
-                    longestChoiceSize = width;
-                else if (longestChoiceSize < width)
-                {
-                    longestChoiceSize = width;
-                }
-            }
-
-            if (longestChoiceSize != 0f)
-            {
-                longestChoiceSize *= canvas.scaleFactor;
-                bubbleBackRectTransform.sizeDelta = new Vector2(longestChoiceSize, bubbleBackRectTransform.rect.height);
-            }
-        }*/
-
-		//TODO: Okay trying to fucking resize the fucking fucker.
-		if (textBlockSize != Vector2.zero && !finishedResizing) 
-		{
-			bubbleBackRectTransform.sizeDelta = textBlockSize;
-			Debug.Log ("RESIZED BITCH");
-			//bubbleBackRectTransform.sizeDelta = new Vector2 (bubbleBackRectTransform.sizeDelta.x, textBlockSize.y + 15f);
-			finishedResizing = true;
-		}
 
         //This is used when the player press "Next Line" when the line is still being in the process of being displayed
         if (skipThisLine && !finishedLine)
@@ -251,20 +217,17 @@ public class DialogueDisplayer : MonoBehaviour {
 
        //nextCharacterTimer += Time.deltaTime;
 
-        //Each time the Timer is greater than the set display speed rate, we create the next word to be displayed.
-		if (/*nextCharacterTimer > displaySpeedRate &&*/ iterator < currentWordsToDisplay.Count) {
-			foreach (string word in currentWordsToDisplay) 
-			{
-				GameObject spawnedNewWord = SpawnWord ();
-				allSpawnedWords.Add (spawnedNewWord);
-
-				setWordStartPos (firstWordMustSpawn, spawnedNewWord);
-				firstWordMustSpawn = false;
-				spawnedNewWord.transform.SetParent (bubbleBackRectTransform.transform);
-
+		if (iterator < currentWordsToDisplay.Count) {
+			foreach (string word in currentWordsToDisplay) {
+				string wordToAdd = "<color=#" + ColorUtility.ToHtmlStringRGBA (color) + ">" + word + "</color>";
+				textToDisplay += wordToAdd;
 				iterator++;
 			}
+			allSpawnedWords.Add (SpawnWord ());
 		}
+
+
+		color = Color.Lerp (color, new Color (1, 1, 1, 0f), 1f * Time.deltaTime);
 
         //If the iterator is greater than the number of words to display, then we're done with this line, let's prepare ourselves to display the next one (Or to close the dialogue...)
         if (iterator >= currentWordsToDisplay.Count)
@@ -326,6 +289,8 @@ public class DialogueDisplayer : MonoBehaviour {
         if (!ChoiceMode)
         {
             currentWordsToDisplay = textToDisplay.Split(' ').ToList<String>();
+
+
             wordWrapChoiceMode = false;
         }
         else
