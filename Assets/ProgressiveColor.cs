@@ -3,30 +3,62 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class ProgressiveColor : MonoBehaviour {
+public class ProgressiveColor : BaseMeshEffect 
+{
+	public Color colorForText;
+	public Color colorForTextDown;
+	public float displacementMultiplier;
 
+	private float internalTime;
+	private bool isDirty;
+	private float lastInternalTime;
+	private float realTotalAnimationTime;
 
-	string displayedText = null;
-	List<string> currentWordsToDisplay = new List<string>();
+	private Text textComponent;
+	private bool isPlaying;
 
-
-	Text text;
-	string colorString;
-	Color color = Color.white;
-
-	// Use this for initialization
-	void Start () 
+	void Start ()
 	{
-		text = gameObject.GetComponent<Text> ();
-		//currentWordsToDisplay = textToDisplay.Split(' ').ToList<String>();
+		displacementMultiplier = 0;
+		textComponent = gameObject.GetComponent<Text> ();
 	}
-	
-	// Update is called once per frame
-	void Update () 
+
+	void Update ()
 	{
-		color = Color.Lerp (color, new Color (1, 1, 1, 0f), 1f * Time.deltaTime);
+		graphic.SetAllDirty ();
+	}
 
+	public override void ModifyMesh(VertexHelper vh)
+	{
+		int count = vh.currentVertCount;
+		if (!IsActive() || count == 0 || isDirty)
+		{
+			vh.Clear();
+			return;
+		}
 
-			text.text = "<color=#" + ColorUtility.ToHtmlStringRGBA(color) + ">" + text + "</color>";
+		int characterCount = 0;
+		for (int i = 0; i < count; i += 4)
+		{
+			//CharacterData characterData = charactersData[characterCount];
+			for (int j = 0; j < 4; j++)
+			{
+				UIVertex uiVertex = new UIVertex ();
+				vh.PopulateUIVertex (ref uiVertex, i + j);
+				if (j < 2) 
+				{
+					uiVertex.color = colorForText;
+					uiVertex.position += Vector3.up * displacementMultiplier;
+				} 
+				else 
+				{
+					uiVertex.color = colorForTextDown;
+				}
+				vh.SetUIVertex (uiVertex, i + j);
+			}
+			characterCount += 1;
+		}
+		Debug.Log ("Character Count is = " + characterCount);
 	}
 }
+
