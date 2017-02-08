@@ -36,7 +36,7 @@ public class DialogueDisplayer : MonoBehaviour {
 		bool finishedResizing = false;
 
         //The followings are used in case we are displaying a choice.
-        List<GameObject> allSpawnedWords = new List<GameObject>();
+        GameObject spawnedWord;
         bool recalculateBubbleSizeForChoices = false;
 		Color color = Color.white;
     #endregion
@@ -90,6 +90,9 @@ public class DialogueDisplayer : MonoBehaviour {
         bubbleBackImage = gameObject.GetComponentInChildren<Image>();
         bubbleBackRectTransform = bubbleBackImage.gameObject.GetComponent<RectTransform>();
         AllImages = transform.GetComponentsInChildren<Image>();
+        spawnedWord = GameObject.Find("Word");
+        color = spawnedWord.GetComponent<Text>().color;
+        color.a = 0f;
 
         //At game start, we want to hide the bubbles
         NextLineLogo.SetActive(false);
@@ -104,7 +107,7 @@ public class DialogueDisplayer : MonoBehaviour {
     }
 
     //Spawn a word and return the created gameObject
-    GameObject SpawnWord ()
+    /*GameObject SpawnWord ()
     {
         GameObject spawnedWord = GameObject.Instantiate(wordPrefab) as GameObject;
         Text newWordText = spawnedWord.GetComponent<Text>();
@@ -116,7 +119,7 @@ public class DialogueDisplayer : MonoBehaviour {
         //newWordText.text += " ";
 
         return spawnedWord;
-    }
+    }*/
 
     //Set the word initial position right after being spawned
     //This also parents the word to the dialogueDisplayer, so we make sure it'll follow the bubble dynamically
@@ -160,10 +163,11 @@ public class DialogueDisplayer : MonoBehaviour {
 		BrokeThisLineAtLeastOnce = false;
 		textBlockSize = Vector2.zero;
 		finishedResizing = false;
-        GameObject[] everySingleWord = GameObject.FindGameObjectsWithTag("DialogueWord");
+
+        /*GameObject[] everySingleWord = GameObject.FindGameObjectsWithTag("DialogueWord");
 
         foreach (GameObject word in everySingleWord)
-            GameObject.Destroy(word);
+            GameObject.Destroy(word);*/
 
         firstWordMustSpawn = true;
         DisplayNewText(textToDisplay, ChoiceMode);
@@ -192,13 +196,13 @@ public class DialogueDisplayer : MonoBehaviour {
         return totalLength;
     }
 
-	public void BrokeLineNow (GameObject word)
+	/*public void BrokeLineNow (GameObject word)
 	{
 		if (!BrokeThisLineAtLeastOnce) {
-			lastWordBeforeBreak = allSpawnedWords[ allSpawnedWords.IndexOf(word) - 1 ];
+			lastWordBeforeBreak = spawnedWord[ spawnedWord.IndexOf(word) - 1 ];
 			BrokeThisLineAtLeastOnce = true;
 		}
-	}
+	}*/
 
     // Update is called once per frame
     void Update ()
@@ -217,29 +221,33 @@ public class DialogueDisplayer : MonoBehaviour {
 
        //nextCharacterTimer += Time.deltaTime;
 
-		if (iterator < currentWordsToDisplay.Count) {
-			foreach (string word in currentWordsToDisplay) {
+		//if (iterator < currentWordsToDisplay.Count)
+        //{
+            textToDisplay = "";
+			foreach (string word in currentWordsToDisplay)
+            {
 				string wordToAdd = "<color=#" + ColorUtility.ToHtmlStringRGBA (color) + ">" + word + "</color>";
 				textToDisplay += wordToAdd;
 				iterator++;
 			}
-			allSpawnedWords.Add (SpawnWord ());
-		}
+
+            spawnedWord.GetComponent<Text>().text = textToDisplay;
+		//}
 
 
-		color = Color.Lerp (color, new Color (1, 1, 1, 0f), 1f * Time.deltaTime);
+		color = Color.Lerp (color, new Color (color.r, color.g, color.b, 1f), 1f * Time.deltaTime);
 
         //If the iterator is greater than the number of words to display, then we're done with this line, let's prepare ourselves to display the next one (Or to close the dialogue...)
         if (iterator >= currentWordsToDisplay.Count)
         {
-			textBlockSize = TextBlockSize ();
+			//textBlockSize = TextBlockSize ();
             finishedLine = true;
-            Debug.LogWarning("Line finished");
+            //Debug.LogWarning("Line finished");
             NextLineLogo.SetActive(true);
         }
 	}
 
-	Vector2 TextBlockSize ()
+	/*Vector2 TextBlockSize ()
 	{
 		float width = 0f;
 		float height = 0f;
@@ -249,7 +257,7 @@ public class DialogueDisplayer : MonoBehaviour {
 		float yMin = 0f;
 		float yMax = 0f;
 
-		foreach (GameObject word in allSpawnedWords) 
+		foreach (GameObject word in spawnedWord) 
 		{
 			RectTransform rectTransform = word.GetComponent<Text> ().rectTransform;
 			Rect text = word.GetComponent<Text> ().rectTransform.rect;
@@ -281,7 +289,7 @@ public class DialogueDisplayer : MonoBehaviour {
 		Debug.LogWarning ("New optimal size for the bubble is = " + width + " x " + height);
 
 		return new Vector2 (Mathf.Abs (width), Mathf.Abs (height));
-	}
+	}*/
     
     //This method actually separate each words of the line into a string array that will be used to spawn each word's gameObject individually
     public void DisplayNewText(string newText, bool ChoiceMode)

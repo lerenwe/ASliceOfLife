@@ -93,7 +93,7 @@ public class PlayerControls : MonoBehaviour {
         {
             if (a_hit.collider != null)
             {
-                Debug.Log("RAYCAST GROUND HIT SOMETHING");
+                //Debug.Log("RAYCAST GROUND HIT SOMETHING");
                 if (a_hit.transform.CompareTag("Ground"))
                 {
                     isGrounded = true;

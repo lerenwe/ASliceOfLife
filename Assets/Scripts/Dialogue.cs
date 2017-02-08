@@ -239,12 +239,12 @@ public class Dialogue : MonoBehaviour {
                         image.enabled = false;
                     }
 
-                    GameObject[] AllWords = GameObject.FindGameObjectsWithTag("DialogueWord");
+                    /*GameObject[] AllWords = GameObject.FindGameObjectsWithTag("DialogueWord");
 
                     foreach (GameObject word in AllWords)
                     {
                         Destroy(word);
-                    }
+                    }*/
 
                     dialogueDisplayer.ResetDialogueBubble(false);
 

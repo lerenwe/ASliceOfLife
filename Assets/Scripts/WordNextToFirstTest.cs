@@ -124,7 +124,7 @@ public class WordNextToFirstTest : MonoBehaviour {
         brokeLineOnce = true;
 
 		//parentDialogue.BrokeThisLineAtLeastOnce = true;
-		parentDialogue.BrokeLineNow(this.gameObject);
+		//parentDialogue.BrokeLineNow(this.gameObject);
 
         return new Vector2(targetXPos, targetYPos);
     }

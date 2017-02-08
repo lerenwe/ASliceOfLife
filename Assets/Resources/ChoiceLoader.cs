@@ -6,7 +6,19 @@ using System.IO;
 [ExecuteInEditMode]
 public class ChoiceLoader : MonoBehaviour {
     // Use this for initialization
-    public ChoicesContainer everyChoices;
+    ChoicesContainer _everyChoices;
+    public ChoicesContainer everyChoices
+    {
+        get
+        {
+            return this._everyChoices;
+        }
+        set
+        {
+            this._everyChoices = value;
+            Save();
+        }
+    } 
 
     void Start () 
     {
@@ -21,8 +33,11 @@ public class ChoiceLoader : MonoBehaviour {
 
     void Update ()
     {
-        everyChoices.Save(Path.Combine(Application.dataPath, "choices.xml"));
+        
     }
 	
-	
+	void Save ()
+    {
+        everyChoices.Save(Path.Combine(Application.dataPath, "choices.xml"));
+    }
 }
