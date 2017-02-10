@@ -160,7 +160,7 @@ namespace BrunoMikoski.TextJuicer
             }
         }
 
-        private void UpdateTime()
+        private void UpdateTime() //TODO : Should check this for optimization...
         {
             if (!isPlaying)
             {
