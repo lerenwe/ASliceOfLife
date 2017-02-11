@@ -3,11 +3,16 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
 public class ProgressiveColor : BaseMeshEffect 
 {
 	Color colorForText;
     public Color startColorForText;
 	public Color targetColorForText;
+	Color editorColor;
     public float speed;
 	public float displacementMultiplier;
 
@@ -21,18 +26,27 @@ public class ProgressiveColor : BaseMeshEffect
     bool finishedCountingCharacters = false;
     bool play = false;
     bool dirty = false;
-    bool initialize = true;
+	bool initialize = false;
 
     Vector2[] characterVertices = new Vector2[4];
 
     List<float> progress = new List<float>();
     List<float> previousProgress = new List<float>();
+	List<Vector3> animStartPos = new List<Vector3> ();
 
     void Awake ()
 	{
 		displacementMultiplier = 0; // TODO: Should be displaced on start, THEN go to initial position, would be more logical
 		textComponent = gameObject.GetComponent<Text> ();
+		editorColor = textComponent.color;
         textComponent.color = startColorForText;
+
+		#if UNITY_EDITOR
+		if (!EditorApplication.isPlaying)
+		{
+			textComponent.color = editorColor;
+		}
+		#endif
 	}
 
 	void Update ()
@@ -40,6 +54,7 @@ public class ProgressiveColor : BaseMeshEffect
         if (Input.GetKeyDown("w"))
         {
             play = true;
+			initialize = true;
         }
 
         if (play)
@@ -84,6 +99,11 @@ public class ProgressiveColor : BaseMeshEffect
 
 	public override void ModifyMesh(VertexHelper vh)
 	{
+		#if UNITY_EDITOR
+		if(EditorApplication.isPlaying)
+		{
+		#endif
+			
 		int count = vh.currentVertCount;
 		if (!IsActive() || count == 0 || isDirty)
 		{
@@ -104,9 +124,16 @@ public class ProgressiveColor : BaseMeshEffect
                     UIVertex uiVertex = new UIVertex();
                     vh.PopulateUIVertex(ref uiVertex, i + j);
 
-                    uiVertex.color = Color.Lerp(startColorForText, targetColorForText, progress[characterCount]);
+					uiVertex.color = Color.Lerp (startColorForText, targetColorForText, progress [characterCount]);
 
-                    uiVertex.position -= Vector3.up * progress[characterCount] * 10f;
+					if (initialize)
+						uiVertex.position += Vector3.up * 10f;
+					else
+						uiVertex.position = animStartPos[i+j] - Vector3.up * progress [characterCount] * 10f;
+
+					if (initialize)
+						animStartPos.Add (uiVertex.position);
+
                     vh.SetUIVertex(uiVertex, i + j);
                 }
 			}
@@ -121,7 +148,12 @@ public class ProgressiveColor : BaseMeshEffect
             previousProgress.Add(0);
         }
 
+		initialize = false;
 		//Debug.Log ("Character Count is = " + characterCount + " & progress count is = " + progress.Count);
+			#if UNITY_EDITOR
+		}
+			#endif
 	}
+
 }
 
