@@ -162,7 +162,7 @@ public class PlayerControls : MonoBehaviour {
         {
             if (!hit.GetComponent<subSceneExit>().touchToExit)
             {
-                Debug.Log("Overlapping active Exit");
+                //Debug.Log("Overlapping active Exit");
                 hit.GetComponent<subSceneExit>().UpdatePreRequisiteStatus();
 
                 if (hit.GetComponent<subSceneExit>().preRequisitesMatch)

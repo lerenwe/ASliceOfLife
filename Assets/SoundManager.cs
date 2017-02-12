@@ -94,7 +94,7 @@ public class SoundManager : MonoBehaviour {
 
 	    if (Intro)
         {
-            Debug.Log("Intro Music Fading in...");
+            //Debug.Log("Intro Music Fading in...");
             mainAudioSource.clip = IntroMusic;
 
             if (MainMusicVol <= -80f)
@@ -104,7 +104,7 @@ public class SoundManager : MonoBehaviour {
 
             if (MainMusicVol == 0)
             {
-                Debug.Log("Intro Music Now Playing...");
+                //Debug.Log("Intro Music Now Playing...");
                 Intro = false;
             }
         }

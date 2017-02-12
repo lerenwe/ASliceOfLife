@@ -157,6 +157,8 @@ public class subSceneExit : MonoBehaviour {
             if (choice.madeFirstChoice == true && choice.madeFirstChoice != choiceLoader.everyChoices.choices[countChoiceCheck].madeFirstChoice)
                 choiceLoader.everyChoices.choices[countChoiceCheck].madeFirstChoice = choice.madeFirstChoice;
 
+            choiceLoader.Save();
+
             countChoiceCheck++;
         }
 

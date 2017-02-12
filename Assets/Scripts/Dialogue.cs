@@ -62,7 +62,7 @@ public class Dialogue : MonoBehaviour {
     }
 
 	// Update is called once per frame
-	void LateUpdate ()
+	void Update ()
     {
         if (firstInit && dialogueTriggered)
         {
@@ -214,14 +214,14 @@ public class Dialogue : MonoBehaviour {
                         DisplayChoices(ref text);
                     }
                     else
-                    if (!story.canContinue && story.currentChoices.Count <= 0)
+                    if (!story.canContinue /*&& story.currentChoices.Count <= 0*/)
                     {
                         lastLine = true; //We reached the last line, the dialogue is now over and ready to be closed
                     }
-                    else if (!story.canContinue && story.currentChoices.Count > 0)
+                    /*else if (!story.canContinue && story.currentChoices.Count > 0)
                     {
                         displayChoiceNext = true;
-                    }
+                    }*/ //TODO: Should reactivate this to work on the choice display
 
 
 

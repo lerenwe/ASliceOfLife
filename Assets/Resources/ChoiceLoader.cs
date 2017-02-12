@@ -7,8 +7,8 @@ using System.IO;
 public class ChoiceLoader : MonoBehaviour {
     // Use this for initialization
     ChoicesContainer _everyChoices;
-    public ChoicesContainer everyChoices
-    {
+    public ChoicesContainer everyChoices;
+    /*{
         get
         {
             return this._everyChoices;
@@ -18,11 +18,12 @@ public class ChoiceLoader : MonoBehaviour {
             this._everyChoices = value;
             Save();
         }
-    } 
+    }*/
 
     void Start () 
     {
         everyChoices = ChoicesContainer.Load(Path.Combine(Application.dataPath, "choices.xml"));
+
         //everyChoices.Save(Path.Combine(Application.dataPath, "items.xml"));
         foreach (Choice choice in everyChoices.choices)
         {
@@ -36,7 +37,7 @@ public class ChoiceLoader : MonoBehaviour {
         
     }
 	
-	void Save ()
+	public void Save ()
     {
         everyChoices.Save(Path.Combine(Application.dataPath, "choices.xml"));
     }

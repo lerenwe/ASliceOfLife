@@ -1,6 +1,8 @@
 -SoccerKid: Hey, salut ! Je t'ai jamais vu dans le coin, toi, non ?
 -Player: Oh ouais, je viens tout juste de changer de Lycée...
--SoccerKid: Oh merde, aussi tôt dans l'année ? Enfin, hey, t'inquiète pas, je suis sûr que tu seras pas seul longtemps ici. D'ailleurs, tu joue au foot ? Tu veux nous rejoindre ? Un crétin nous a fait faux bond, et il nous manque un joueur.
+-SoccerKid: Oh merde, aussi tôt dans l'année ? Enfin, hey, t'inquiète pas, je suis sûr que tu seras pas seul longtemps ici. 
+-SoccerKid: D'ailleurs, tu joue au foot ? Tu veux nous rejoindre ? Un crétin nous a fait faux bond, et il nous manque un joueur.
+-Player: Abby, si tu lis ça, et que tu t'es encore moquée, sache que je suis très déçu par ton attitude, oker è_é.
 *Oui, putain, je préfère n'importe quoi à ce cours de français à la con.
 ->OMGYES
 *Hmmm, c'est tentant mais je suis censé aller en cours, là...
