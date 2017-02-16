@@ -26,6 +26,7 @@ public class DialogueDisplayer : MonoBehaviour {
         [HideInInspector] public bool finishedLine = false;
         bool firstWordMustSpawn = true;
         bool wordWrapChoiceMode = false;
+        bool displayOnNextFrame = false;
 
         float targetYPos;
 
@@ -179,12 +180,21 @@ public class DialogueDisplayer : MonoBehaviour {
             NextLineLogo.SetActive(true);
         }
 	}
-    
+
+    private void LateUpdate()
+    {
+        if (displayOnNextFrame)
+        {
+            textComponent.text = textToDisplay;
+            textScript.PlayNow();
+            displayOnNextFrame = false;
+        }
+    }
+
     //This method actually separate each words of the line into a string array that will be used to spawn each word's gameObject individually
     public void DisplayNewText(string newText, bool ChoiceMode)
     {
-        textComponent.text = textToDisplay;
-        textScript.PlayNow();
+        displayOnNextFrame = true;
     }
 
     }
