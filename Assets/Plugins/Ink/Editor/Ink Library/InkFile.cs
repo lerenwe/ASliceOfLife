@@ -72,6 +72,12 @@ namespace Ink.UnityIntegration {
 					return InkLibrary.GetInkFileWithFile(master);
 			}
 		}
+		public InkFile masterInkFileIncludingSelf {
+			get {
+				return isMaster ? this : masterInkFile;
+			}
+		}
+
 		// Is this ink file a master file?
 		public bool isMaster {
 			get {
@@ -102,8 +108,8 @@ namespace Ink.UnityIntegration {
 		public List<InkFile> inkFilesInIncludeHierarchy {
 			get {
 				List<InkFile> _includesInkFiles = new List<InkFile>();
+				_includesInkFiles.Add(this);
 				foreach(var child in includesInkFiles) {
-					_includesInkFiles.Add(child);
 					_includesInkFiles.AddRange(child.inkFilesInIncludeHierarchy);
 				}
 				return _includesInkFiles;
@@ -146,7 +152,6 @@ namespace Ink.UnityIntegration {
 
 		public bool requiresCompile {
 			get {
-				InkFile masterInkFileIncludingSelf = isMaster ? this : masterInkFile;
 				if(masterInkFileIncludingSelf.jsonAsset == null) 
 					return true;
 
@@ -171,7 +176,6 @@ namespace Ink.UnityIntegration {
 		/// <value>The last compile date of the story.</value>
 		public DateTime lastCompileDate {
 			get {
-				InkFile masterInkFileIncludingSelf = isMaster ? this : masterInkFile;
 				string fullJSONFilePath = InkEditorUtils.CombinePaths(Application.dataPath, AssetDatabase.GetAssetPath(masterInkFileIncludingSelf.jsonAsset).Substring(7));
 				return File.GetLastWriteTime(fullJSONFilePath);
 			}
@@ -221,7 +225,7 @@ namespace Ink.UnityIntegration {
 				DefaultAsset includedInkFileAsset = AssetDatabase.LoadAssetAtPath<DefaultAsset>(localIncludePath);
 				InkFile includedInkFile = InkLibrary.GetInkFileWithFile(includedInkFileAsset);
 				if(includedInkFile == null) {
-					Debug.LogError("Expected Ink file at "+localIncludePath+" but file was not found.");
+					Debug.LogError(filePath+ " expected child Ink file at "+localIncludePath+" but file was not found.");
 				} else if (includedInkFile.includes.Contains(inkAsset)) {
 					Debug.LogError("Circular INCLUDE reference between "+filePath+" and "+includedInkFile.filePath+".");
 				} else
@@ -314,5 +318,9 @@ namespace Ink.UnityIntegration {
 	        List<string> _includeFilenames;
 	        string _text;
 	    }
+		public override string ToString () {
+			return string.Format ("[InkFile: filePath={0}]", filePath);
+		} 
 	}
+
 }

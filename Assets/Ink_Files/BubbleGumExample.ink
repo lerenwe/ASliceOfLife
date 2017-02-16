@@ -1,3 +1,3 @@
--Character1: Okay it does seems that it's working.
--Character2: Yup, we can all relax, and chill and all cool y'know.
+-Player: Faites pas attention à moi, je suis juste un dialogue de Debug.
+-Player: Hydratez vous avec du Dr Pepper, les enfants. Et salez les frites.
 - ->END

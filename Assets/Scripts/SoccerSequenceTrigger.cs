@@ -3,6 +3,8 @@ using System.Collections;
 
 public class SoccerSequenceTrigger : MonoBehaviour {
 
+    public bool DebugDialogue;
+
 	// Use this for initialization
 	void Start () {
 	
@@ -17,8 +19,15 @@ public class SoccerSequenceTrigger : MonoBehaviour {
     {
         if (hit.gameObject.CompareTag ("Player"))
         {
-            SoccerSequenceManager.soccerSequenceMainScript.sequenceStartTriggered = true;
-            Debug.Log("Starting soccer sequence...");
+            if (!DebugDialogue)
+            {
+                SoccerSequenceManager.soccerSequenceMainScript.sequenceStartTriggered = true;
+                Debug.Log("Starting soccer sequence...");
+            }
+            else
+            {
+                GameObject.Find("TestDialogue").GetComponent<Dialogue>().TriggerDialogue();
+            }
         }
     }
 }

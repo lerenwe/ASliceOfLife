@@ -20,7 +20,7 @@ public class Dialogue : MonoBehaviour {
         [HideInInspector] public bool dialogueInProgress = false;
         [HideInInspector] public bool dialogueClosed = false;
 
-        int currentLineToDisplay = 0;
+    int currentLineToDisplay = 0;
         bool dialogueStarted = false;
         bool lastLine = false;
         bool firstInit = true;
@@ -62,7 +62,7 @@ public class Dialogue : MonoBehaviour {
     }
 
 	// Update is called once per frame
-	void Update ()
+	void LateUpdate ()
     {
         if (firstInit && dialogueTriggered)
         {
@@ -79,7 +79,7 @@ public class Dialogue : MonoBehaviour {
                 dialogueDisplayer.DisplayNewText(dialogueDisplayer.textToDisplay, waitingForChoice);
             }
 
-            //All of this stuff is to place the bubble correctly
+            #region All of this stuff is to place the bubble correctly
             if (dialogueInProgress)
             {
                 //The character's position we use is actually its upper sprite bound.
@@ -157,6 +157,7 @@ public class Dialogue : MonoBehaviour {
                     image.enabled = true; // And finally display all images
                 }
             }
+            #endregion
 
             if (dialogueDisplayer != null)
             {

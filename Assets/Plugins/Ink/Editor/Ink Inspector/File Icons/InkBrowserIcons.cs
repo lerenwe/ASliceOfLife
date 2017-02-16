@@ -67,6 +67,15 @@ namespace Ink.UnityIntegration {
 				return _todoIcon;
 			}
 		}
+		private static Texture2D _manualIcon;
+		public static Texture2D manualIcon {
+			get {
+				if(_manualIcon == null) {
+					_manualIcon = Resources.Load<Texture2D>("InkCompileManualIcon");
+				}
+				return _manualIcon;
+			}
+		}
 		private static Texture2D _childIcon;
 		public static Texture2D childIcon {
 			get {
@@ -100,24 +109,24 @@ namespace Ink.UnityIntegration {
 	    }
 
 	    static void OnDrawProjectWindowItem(string guid, Rect rect) {
-	    	if(!InkLibrary.created)
-	    		return;
-	        var path = AssetDatabase.GUIDToAssetPath(guid);
+	        string path = AssetDatabase.GUIDToAssetPath(guid);
+			if (Path.GetExtension(path) == InkEditorUtils.inkFileExtension && InkLibrary.created) {
+				DefaultAsset asset = AssetDatabase.LoadAssetAtPath<DefaultAsset>(path);
+				DrawInkFile(InkLibrary.GetInkFileWithFile(asset), rect);
+			}
+	    }
 
-			if (Path.GetExtension(path) == InkEditorUtils.inkFileExtension) {
-				InkFile inkFile = InkLibrary.GetInkFileWithPath(path);
-
-				var isSmall = rect.width > rect.height;
-				if (isSmall) {
-					rect.width = rect.height;
-				} else {
-					rect.height = rect.width;
-				}
-				if (rect.width >= largeIconSize) {
-					DrawLarge(inkFile, rect);
-				} else {
-					DrawSmall(inkFile, rect);
-				}
+		static void DrawInkFile (InkFile inkFile, Rect rect) {
+			bool isSmall = rect.width > rect.height;
+			if (isSmall) {
+				rect.width = rect.height;
+			} else {
+				rect.height = rect.width;
+			}
+			if (rect.width >= largeIconSize) {
+				DrawLarge(inkFile, rect);
+			} else {
+				DrawSmall(inkFile, rect);
 			}
 	    }
 
@@ -147,6 +156,7 @@ namespace Ink.UnityIntegration {
 		}
 
 		static void DrawSmall (InkFile inkFile, Rect rect) {
+			rect.x += 3;
 			if(inkFileIcon != null)
 				GUI.DrawTexture(rect, inkFileIcon);
 
@@ -155,6 +165,9 @@ namespace Ink.UnityIntegration {
 					GUI.DrawTexture(new Rect(rect.x, rect.y, unknownFileIcon.width, unknownFileIcon.height), unknownFileIcon);
 				}
 			} else {
+				if(!InkLibrary.Instance.compileAutomatically && !inkFile.masterInkFileIncludingSelf.compileAutomatically)
+					GUI.DrawTexture(new Rect(rect.x, rect.y + rect.size.y * 0.5f, rect.size.x * 0.5f, rect.size.y * 0.5f), manualIcon);
+
 				Rect miniRect = new Rect(rect.center, rect.size * 0.5f);
 				if(inkFile.hasErrors && errorIcon != null) {
 					GUI.DrawTexture(miniRect, errorIcon);

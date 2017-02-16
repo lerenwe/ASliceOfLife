@@ -109,9 +109,13 @@ namespace Ink.UnityIntegration {
 				Debug.LogError("Due to a Unity bug, Inklecate path cannot contain an apostrophe. Ink will not compile until this is resolved. Path is '"+inklecatePath+"'");
 				return;
 			}
+			// This hasn't been affecting us lately. Left it in so we can easily restore it in case of future bugs.
+			/* else if(inklecatePath.Contains(" ")){
+				Debug.LogWarning("Inklecate path should not contain a space. This might lead to compilation failing. Path is '"+inklecatePath+"'. If you don't see any compilation errors, you can ignore this warning.");
+			}*/
 			string inputPath = InkEditorUtils.CombinePaths(inkFile.absoluteFolderPath, Path.GetFileName(inkFile.filePath));
 			string outputPath = InkEditorUtils.CombinePaths(inkFile.absoluteFolderPath, Path.GetFileNameWithoutExtension(Path.GetFileName(inkFile.filePath))) + ".json";
-			string inkArguments = "-c -o " + "\"" + outputPath + "\" \"" + inputPath + "\"";
+			string inkArguments = InkLibrary.Instance.customInklecateOptions.additionalCompilerOptions + " -c -o " + "\"" + outputPath + "\" \"" + inputPath + "\"";
 
 			CompilationStackItem pendingFile = new CompilationStackItem();
 			pendingFile.inkFile = InkLibrary.GetInkFileWithAbsolutePath(inputPath);
@@ -121,8 +125,15 @@ namespace Ink.UnityIntegration {
 			InkLibrary.Instance.compilationStack.Add(pendingFile);
 
 			Process process = new Process();
-			process.StartInfo.FileName = inklecatePath;
-			process.StartInfo.Arguments = inkArguments;
+
+			if( InkLibrary.Instance.customInklecateOptions.runInklecateWithMono ) {
+				process.StartInfo.FileName = "/usr/local/bin/mono";
+				process.StartInfo.Arguments = inklecatePath + " " + inkArguments;
+			} else {
+				process.StartInfo.FileName = inklecatePath;
+				process.StartInfo.Arguments = inkArguments;
+			}
+
 			process.StartInfo.RedirectStandardError = true;
 			process.StartInfo.RedirectStandardOutput = true;
 			process.StartInfo.UseShellExecute = false;
@@ -192,7 +203,7 @@ namespace Ink.UnityIntegration {
 						listOfFiles += " (With error)";
 						errorsFound = true;
 					} else {
-						string localJSONAssetPath = compilingFile.jsonAbsoluteFilePath.Substring (Application.dataPath.Length - 6);
+						string localJSONAssetPath = InkEditorUtils.AbsoluteToUnityRelativePath(compilingFile.jsonAbsoluteFilePath);
 						AssetDatabase.ImportAsset (localJSONAssetPath);
 						compilingFile.inkFile.jsonAsset = AssetDatabase.LoadAssetAtPath<TextAsset> (localJSONAssetPath);
 					}
@@ -218,6 +229,7 @@ namespace Ink.UnityIntegration {
 			if(EditorApplication.isPlayingOrWillChangePlaymode) {
 				Debug.LogWarning("Ink just finished recompiling while in play mode. Your runtime story may not be up to date.");
 			}
+			InkLibrary.Save();
 		}
 
 		private static void SetOutputLog (CompilationStackItem pendingFile) {

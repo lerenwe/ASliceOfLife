@@ -17,13 +17,7 @@ namespace Ink.UnityIntegration {
 	public class InkLibrary : ScriptableObject {
 		public static bool created {
 			get {
-				InkLibrary tmpSettings = AssetDatabase.LoadAssetAtPath<InkLibrary>(defaultPath);
-				if(tmpSettings != null) 
-					return true;
-				string[] GUIDs = AssetDatabase.FindAssets("t:"+typeof(InkLibrary).Name);
-				if(GUIDs.Length > 0)
-					return true;
-				return false;
+				return FindLibrary() != null;
 			}
 		}
 		private static InkLibrary _Instance;
@@ -35,12 +29,30 @@ namespace Ink.UnityIntegration {
 			}
 		}
 		public const string defaultPath = "Assets/InkLibrary.asset";
+		public const string pathPlayerPrefsKey = "InkLibraryAssetPath";
+
+		public TextAsset templateFile;
+		public string templateFilePath {
+			get {
+				if(templateFile == null) return "";
+				else return AssetDatabase.GetAssetPath(templateFile);
+			}
+		}
 
 		public bool compileAutomatically = true;
 		public bool handleJSONFilesAutomatically = true;
 
 		public List<InkFile> inkLibrary = new List<InkFile>();
 		public List<InkCompiler.CompilationStackItem> compilationStack = new List<InkCompiler.CompilationStackItem>();
+
+		public CustomInklecateOptions customInklecateOptions = new CustomInklecateOptions();
+		[System.Serializable]
+		public class CustomInklecateOptions {
+			public bool runInklecateWithMono;
+			public string additionalCompilerOptions;
+			public DefaultAsset inklecate;
+		}
+
 
 		[MenuItem("Edit/Project Settings/Ink", false, 500)]
 		public static void SelectFromProjectSettings() {
@@ -58,21 +70,29 @@ namespace Ink.UnityIntegration {
 			}
 		}
 
-		private static InkLibrary FindOrCreateLibrary () {
-			InkLibrary tmpSettings = AssetDatabase.LoadAssetAtPath<InkLibrary>(defaultPath);
-			if(tmpSettings == null) {
-				string[] GUIDs = AssetDatabase.FindAssets("t:"+typeof(InkLibrary).Name);
-				if(GUIDs.Length > 0) {
-					string path = AssetDatabase.GUIDToAssetPath(GUIDs[0]);
-					tmpSettings = AssetDatabase.LoadAssetAtPath<InkLibrary>(path);
-					if(GUIDs.Length > 1) {
-						for(int i = 1; i < GUIDs.Length; i++) {
-							AssetDatabase.DeleteAsset(AssetDatabase.GUIDToAssetPath(GUIDs[i]));
-						}
-						Debug.LogWarning("More than one InkLibrary was found. Deleted excess libraries.");
-					}
-				}
+		private static InkLibrary FindLibrary () {
+			if(EditorPrefs.HasKey(pathPlayerPrefsKey)) {
+				InkLibrary tmpLibrary = AssetDatabase.LoadAssetAtPath<InkLibrary>(EditorPrefs.GetString(pathPlayerPrefsKey));
+				if(tmpLibrary != null) return tmpLibrary;
 			}
+
+			string[] GUIDs = AssetDatabase.FindAssets("t:"+typeof(InkLibrary).Name);
+			if(GUIDs.Length > 0) {
+				if(GUIDs.Length > 1) {
+					for(int i = 1; i < GUIDs.Length; i++) {
+						AssetDatabase.DeleteAsset(AssetDatabase.GUIDToAssetPath(GUIDs[i]));
+					}
+					Debug.LogWarning("More than one InkLibrary was found. Deleted excess libraries.");
+				}
+				string path = AssetDatabase.GUIDToAssetPath(GUIDs[0]);
+				EditorPrefs.SetString(pathPlayerPrefsKey, path);
+				return AssetDatabase.LoadAssetAtPath<InkLibrary>(path);
+			}
+			return null;
+		}
+
+		private static InkLibrary FindOrCreateLibrary () {
+			InkLibrary tmpSettings = FindLibrary();
 			// If we couldn't find the asset in the project, create a new one.
 			if(tmpSettings == null) {
 				tmpSettings = CreateInkLibrary ();
@@ -87,6 +107,8 @@ namespace Ink.UnityIntegration {
 			AssetDatabase.CreateAsset (asset, defaultPath);
 			AssetDatabase.SaveAssets ();
 			AssetDatabase.ImportAsset(AssetDatabase.GetAssetPath(asset));
+			EditorPrefs.SetString(pathPlayerPrefsKey, defaultPath);
+			asset.templateFile = Resources.Load<TextAsset>("InkDefaultTemplate");
 			return asset;
 		}
 
@@ -110,7 +132,7 @@ namespace Ink.UnityIntegration {
 			for (int i = 0; i < inkFilePaths.Length; i++) {
 				InkFile inkFile = GetInkFileWithAbsolutePath(inkFilePaths [i]);
 				if(inkFile == null) {
-					string localAssetPath = inkFilePaths [i].Substring(Application.dataPath.Length-6);
+					string localAssetPath = InkEditorUtils.AbsoluteToUnityRelativePath(inkFilePaths [i]);
 					DefaultAsset inkFileAsset = AssetDatabase.LoadAssetAtPath<DefaultAsset>(localAssetPath);
 					// If the ink file can't be found, it might not yet have been imported. We try to manually import it to fix this.
 					if(inkFileAsset == null) {
@@ -135,7 +157,10 @@ namespace Ink.UnityIntegration {
 			foreach (InkFile inkFile in InkLibrary.Instance.inkLibrary) {
 				inkFile.FindCompiledJSONAsset();
 			}
+			Save();
+		}
 
+		public static void Save () {
 			EditorUtility.SetDirty(InkLibrary.Instance);
 			AssetDatabase.SaveAssets();
 			EditorApplication.RepaintProjectWindow();

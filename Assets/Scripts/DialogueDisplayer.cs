@@ -103,7 +103,7 @@ public class DialogueDisplayer : MonoBehaviour {
         }
 
         Dialogue.dialogueDisplayObject = this.gameObject; 
-        gameObject.SetActive(false);
+        //gameObject.SetActive(false);
     }
 
     //Set the word initial position right after being spawned
@@ -184,7 +184,7 @@ public class DialogueDisplayer : MonoBehaviour {
     public void DisplayNewText(string newText, bool ChoiceMode)
     {
         textComponent.text = textToDisplay;
-        textScript.play = true;
+        textScript.PlayNow();
     }
 
     }
