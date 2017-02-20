@@ -19,8 +19,9 @@ public class Dialogue : MonoBehaviour {
         [HideInInspector] public bool dialogueTriggered = false;
         [HideInInspector] public bool dialogueInProgress = false;
         [HideInInspector] public bool dialogueClosed = false;
+        bool waitForInitFrame = false;
 
-    int currentLineToDisplay = 0;
+        int currentLineToDisplay = 0;
         bool dialogueStarted = false;
         bool lastLine = false;
         bool firstInit = true;
@@ -57,6 +58,7 @@ public class Dialogue : MonoBehaviour {
             iterator++;
         }
 
+        waitForInitFrame = true;
         dialogueTriggered = true;
         dialogueStarted = true;
     }
@@ -71,7 +73,7 @@ public class Dialogue : MonoBehaviour {
             firstInit = false;
         }
 
-        if (!dialogueClosed)
+        if (!waitForInitFrame && !dialogueClosed)
         {
             if (dialogueTriggered || (dialogueInProgress && !lastLine &&Input.GetButtonDown("Submit"))) //Display the first line & the next one when "Next Line" is pressed
             {
@@ -203,7 +205,6 @@ public class Dialogue : MonoBehaviour {
                         dialogueTriggered = false;
                         dialogueInProgress = true;
                     }
-                    //else if (story.currentChoices.Count > 0)
                         
 
 
@@ -215,14 +216,14 @@ public class Dialogue : MonoBehaviour {
                         DisplayChoices(ref text);
                     }
                     else
-                    if (!story.canContinue /*&& story.currentChoices.Count <= 0*/)
+                    if (!story.canContinue && story.currentChoices.Count <= 0)
                     {
                         lastLine = true; //We reached the last line, the dialogue is now over and ready to be closed
                     }
-                    /*else if (!story.canContinue && story.currentChoices.Count > 0)
+                    else if (!story.canContinue && story.currentChoices.Count > 0)
                     {
                         displayChoiceNext = true;
-                    }*/ //TODO: Should reactivate this to work on the choice display
+                    } //TODO: Should reactivate this to work on the choice display
 
 
 
@@ -254,16 +255,23 @@ public class Dialogue : MonoBehaviour {
                 }
             }
         }
+
+        waitForInitFrame = false;
     }
 
     void DisplayChoices (ref string text) //TODO : Cleanup : Not sure if the ref is needed after all...
     {
         text = charactersName[0].Trim() + ":";
 
+        int iterator = 0;
         foreach (Ink.Runtime.Choice choice in story.currentChoices)
         {
-            text += "#";
+            if (iterator != 0)
+                text += "*";
+
             text += choice.text.Trim();
+
+            iterator++;
         }
 
         dialogueDisplayer.textToDisplay = text.Trim();

@@ -16,7 +16,8 @@ public class BubbleText : BaseMeshEffect
 	public float displacementMultiplier;
     public float timeBeforeNextChar = .15f;
 	private Text textComponent;
-    public bool play = false;
+    [SerializeField]
+    bool play = false;
     [HideInInspector]
     public bool finished = false;
     [HideInInspector]

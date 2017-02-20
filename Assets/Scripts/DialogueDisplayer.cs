@@ -50,6 +50,7 @@ public class DialogueDisplayer : MonoBehaviour {
         GameObject NextLineLogo;
         [HideInInspector]
         public Image[] AllImages;
+        ContentSizeFitter wordSizeFitter;
     #endregion
 
     #region Inspector Variables
@@ -94,6 +95,7 @@ public class DialogueDisplayer : MonoBehaviour {
         AllImages = transform.GetComponentsInChildren<Image>();
         textComponent = GameObject.Find("Text").GetComponent<Text>();
         textScript = GameObject.Find("Text").GetComponent<BubbleText>();
+        wordSizeFitter = textComponent.GetComponent<ContentSizeFitter>();
 
         //At game start, we want to hide the bubbles
         NextLineLogo.SetActive(false);
@@ -105,41 +107,6 @@ public class DialogueDisplayer : MonoBehaviour {
 
         Dialogue.dialogueDisplayObject = this.gameObject; 
         //gameObject.SetActive(false);
-    }
-
-    //Set the word initial position right after being spawned
-    //This also parents the word to the dialogueDisplayer, so we make sure it'll follow the bubble dynamically
-    void setWordStartPos (bool isFirstWord, GameObject currentWord)
-    {
-        BubbleText currentWordScript = currentWord.GetComponent<BubbleText>();
-        //currentWordScript.parentDialogue = this;
-
-        if (isFirstWord) //We have to mark the word if it is the first one to spawn for this line, as its position will drive the rest of the words' positions.
-        {
-            if (wordWrapChoiceMode)
-            {
-                //currentWordScript.customWordWrap = false;
-                currentWord.GetComponent<Text>().horizontalOverflow = HorizontalWrapMode.Wrap; //TODO : IMPORTANT : The text box should be resized for the bubble, or vice-versa, dunno, take a decision!
-            }
-
-            //currentWordScript.firstWord = true;
-            //Debug.Log("''" + currentWordScript.name + "''" + " is the first word for this sentence");
-        }
-        else
-        {
-            if (wordWrapChoiceMode)
-            {
-                /*currentWordScript.customWordWrap = true;
-                currentWordScript.choiceMode = true;*/
-                currentWord.GetComponent<Text>().horizontalOverflow = HorizontalWrapMode.Wrap; //TODO : IMPORTANT : The text box should be resized for the bubble, or vice-versa, dunno, take a decision!
-            }
-
-            /*currentWordScript.firstWord = false;
-            currentWordScript.previousWord = previousWordRectTransform; //This will be useful as every word that spawns after the first one will use the previously spawned word
-                                                                        //position in order to place itself. */
-        }
-
-
     }
 
     //Must be called each time we need to clear the bubble (Most of the time, it's to prepare the next line to be displayed).
@@ -195,6 +162,35 @@ public class DialogueDisplayer : MonoBehaviour {
     public void DisplayNewText(string newText, bool ChoiceMode)
     {
         displayOnNextFrame = true;
+
+        if (ChoiceMode)
+        {
+            List<String> allChoices = new List<string>();
+
+            allChoices = textToDisplay.Split('*').ToList<String>();
+
+
+            int iterator = 0;
+            foreach (String choice in allChoices)
+            {
+                if (iterator == 0)
+                {
+                    textToDisplay = choice;
+                    wordSizeFitter.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
+                    wordSizeFitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+                }
+                else
+                {
+                    Vector3 targetPos = new Vector3(textComponent.transform.position.x, textComponent.transform.position.y - (textComponent.rectTransform.rect.size.y * 2) , textComponent.transform.position.z); //TODO : Doesn't work, you asshole
+                    GameObject clonedChoice = GameObject.Instantiate(textComponent.gameObject, textComponent.transform);
+                    clonedChoice.transform.SetParent(bubbleBackImage.transform);
+                    clonedChoice.GetComponent<Text>().text = choice;
+                    clonedChoice.GetComponent<BubbleText>().PlayNow();
+                }
+
+                iterator++;
+            }
+        }
     }
 
     }
