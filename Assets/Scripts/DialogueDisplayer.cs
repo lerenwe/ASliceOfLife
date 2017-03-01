@@ -171,6 +171,7 @@ public class DialogueDisplayer : MonoBehaviour {
 
 
             int iterator = 0;
+            Vector3 previousChoicePos = Vector3.zero;
             foreach (String choice in allChoices)
             {
                 if (iterator == 0)
@@ -178,14 +179,17 @@ public class DialogueDisplayer : MonoBehaviour {
                     textToDisplay = choice;
                     wordSizeFitter.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
                     wordSizeFitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+                    previousChoicePos = textComponent.transform.position;
                 }
                 else
                 {
-                    Vector3 targetPos = new Vector3(textComponent.transform.position.x, textComponent.transform.position.y - (textComponent.rectTransform.rect.size.y * 2) , textComponent.transform.position.z); //TODO : Doesn't work, you asshole
-                    GameObject clonedChoice = GameObject.Instantiate(textComponent.gameObject, textComponent.transform);
+                    Vector3 targetPos = new Vector3(previousChoicePos.x, previousChoicePos.y - (textComponent.rectTransform.rect.size.y * 2) * canvas.scaleFactor , previousChoicePos.z); //TODO : Doesn't work, you asshole
+                    GameObject clonedChoice = GameObject.Instantiate(textComponent.gameObject);
                     clonedChoice.transform.SetParent(bubbleBackImage.transform);
+                    clonedChoice.transform.position = targetPos;
                     clonedChoice.GetComponent<Text>().text = choice;
                     clonedChoice.GetComponent<BubbleText>().PlayNow();
+                    previousChoicePos = clonedChoice.transform.position;
                 }
 
                 iterator++;
