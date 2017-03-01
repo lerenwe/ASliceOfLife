@@ -75,7 +75,7 @@ public class Dialogue : MonoBehaviour {
 
         if (!waitForInitFrame && !dialogueClosed)
         {
-            if (dialogueTriggered || (dialogueInProgress && !lastLine &&Input.GetButtonDown("Submit"))) //Display the first line & the next one when "Next Line" is pressed
+            if (dialogueTriggered || (dialogueInProgress && !lastLine && Input.GetButtonDown("Submit"))) //Display the first line & the next one when "Next Line" is pressed
             {
                 Debug.Log("Waiting for choice is " + waitingForChoice);
                 dialogueDisplayer.DisplayNewText(dialogueDisplayer.textToDisplay, waitingForChoice);
@@ -164,14 +164,16 @@ public class Dialogue : MonoBehaviour {
             if (dialogueDisplayer != null)
             {
                 //Skip line if it's being in the process of getting displayed and player pressed "Next Line" Button
-                if (!dialogueClosed && Input.GetButtonDown("Submit") && !dialogueDisplayer.finishedLine) 
+                if (!dialogueClosed && Input.GetButtonDown("Submit") && !dialogueDisplayer.textScript.finished) 
                 {
                     Debug.Log("Skipped line");
                     dialogueDisplayer.skipThisLine = true;
                 }
                 //But if the line has finished being displayed, 
-                else if (dialogueTriggered || (dialogueInProgress && !lastLine &&Input.GetButtonDown("Submit") && dialogueDisplayer.finishedLine)) 
+                else if (dialogueTriggered || (dialogueInProgress && !lastLine &&Input.GetButtonDown("Submit") && dialogueDisplayer.textScript.finished)) 
                 {
+                    dialogueDisplayer.textScript.finished = false;
+                    dialogueDisplayer.skipThisLine = false;
                     //Then we finally display the text on top of all that, except if we're inside a choice
                     string text = "Text Display Error. Check Dialogue.cs";
 

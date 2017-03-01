@@ -38,7 +38,7 @@ public class DialogueDisplayer : MonoBehaviour {
 
         //The followings are used in case we are displaying a choice.
         Text textComponent;
-        BubbleText textScript;
+        public BubbleText textScript;
         bool recalculateBubbleSizeForChoices = false;
 		Color color = Color.white;
     #endregion
@@ -51,6 +51,7 @@ public class DialogueDisplayer : MonoBehaviour {
         [HideInInspector]
         public Image[] AllImages;
         ContentSizeFitter wordSizeFitter;
+        
     #endregion
 
     #region Inspector Variables
@@ -129,21 +130,25 @@ public class DialogueDisplayer : MonoBehaviour {
     // Update is called once per frame
     void Update ()
     {
-
         //This is used when the player press "Next Line" when the line is still being in the process of being displayed
         //TODO : This is not working with the actual display system, should rework it.
-        /*if (skipThisLine && !finishedLine)
+        if (skipThisLine && !textScript.finished)
         {
-            nextCharacterTimer = displaySpeedRate + 1;
+            textScript.play = false;
+            textScript.progress.Clear();
+            textScript.initialize = true;
+            textScript.GetComponent<Text>().color = textScript.targetColorForText;
+            textScript.finished = true;
+            skipThisLine = false;
+            textScript.GetComponent<Text>().SetAllDirty();
         }
-        else if (skipThisLine && finishedLine)
+        else if (skipThisLine && textScript.finished)
         {
             skipThisLine = false;
-        }*/
+        }
 
         if (textScript.finished)
         {
-            finishedLine = true;
             NextLineLogo.SetActive(true);
         }
 	}
@@ -161,6 +166,7 @@ public class DialogueDisplayer : MonoBehaviour {
     //This method actually separate each words of the line into a string array that will be used to spawn each word's gameObject individually
     public void DisplayNewText(string newText, bool ChoiceMode)
     {
+        //textScript.finished = false;
         displayOnNextFrame = true;
 
         if (ChoiceMode)
@@ -180,10 +186,13 @@ public class DialogueDisplayer : MonoBehaviour {
                     wordSizeFitter.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
                     wordSizeFitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
                     previousChoicePos = textComponent.transform.position;
+                    textComponent.SetAllDirty();
+                    Canvas.ForceUpdateCanvases();
                 }
                 else
                 {
-                    Vector3 targetPos = new Vector3(previousChoicePos.x, previousChoicePos.y - (textComponent.rectTransform.rect.size.y * 2) * canvas.scaleFactor , previousChoicePos.z); //TODO : Doesn't work, you asshole
+                    Vector3 targetPos = new Vector3(previousChoicePos.x, previousChoicePos.y - (textComponent.rectTransform.rect.height * 2) * canvas.scaleFactor, previousChoicePos.z); //TODO : Doesn't work, you asshole
+                    //All right so... You should really call all of this on the next frame, because Unity UI doesn't have time to do shit and that's where the bug come from
                     GameObject clonedChoice = GameObject.Instantiate(textComponent.gameObject);
                     clonedChoice.transform.SetParent(bubbleBackImage.transform);
                     clonedChoice.transform.position = targetPos;

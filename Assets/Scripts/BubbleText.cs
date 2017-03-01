@@ -17,14 +17,14 @@ public class BubbleText : BaseMeshEffect
     public float timeBeforeNextChar = .15f;
 	private Text textComponent;
     [SerializeField]
-    bool play = false;
+    public bool play = false;
     [HideInInspector]
     public bool finished = false;
     [HideInInspector]
     public bool initialize = false;
     int characterCount = 0;
     int verticesCount;
-    List<float> progress = new List<float>();
+    public List<float> progress = new List<float>();
 	List<Vector3> animStartPos = new List<Vector3> ();
 
     void Awake ()
@@ -49,17 +49,17 @@ public class BubbleText : BaseMeshEffect
         play = true;
     }
 
-    void LateUpdate ()
+    void FixedUpdate ()
 	{
         if (finished && play)
         {
             progress.Clear();
             play = false;
-            finished = false;
+            //finished = false; //For making this script standalone, uncomment this line.
             initialize = true;
         }
 
-        if (play && !initialize)
+        if (!finished && play && !initialize)
         {
             if (timeBeforeNextChar > 1)
                 timeBeforeNextChar = 1;
