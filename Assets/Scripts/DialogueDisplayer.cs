@@ -187,10 +187,14 @@ public class DialogueDisplayer : MonoBehaviour {
                     textComponent.horizontalOverflow = HorizontalWrapMode.Overflow;
                     wordSizeFitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize; //Text is now displayed correctly
 
+                    textComponent.SetAllDirty(); //Used to get the real height of the textRect after content size fitter
+                    Canvas.ForceUpdateCanvases();
+
                     //Now let's align the text rect with the upper side of the bubble rect
-                    textComponent.transform.position = new Vector3(textComponent.transform.position.x,
-                        (bubbleBackRectTransform.transform.position.y + (bubbleBackRectTransform.rect.size.y / 2) * canvas.scaleFactor) - (textComponent.rectTransform.rect.size.y) * canvas.scaleFactor, //TODO: This should work but there's a way to factorize it huh. Nah not working because I think it might use the text rect size from the previous frame....
-                        textComponent.transform.position.z); 
+                    float targetY = bubbleBackRectTransform.transform.position.y;
+                    targetY += (bubbleBackRectTransform.rect.size.y / 2) * canvas.scaleFactor;
+                    targetY -= textComponent.rectTransform.rect.size.y * canvas.scaleFactor;
+                    textComponent.transform.position = new Vector3(textComponent.transform.position.x, targetY, textComponent.transform.position.z);
 
                     previousChoicePos = textComponent.transform.position;
                     textComponent.SetAllDirty();
@@ -208,6 +212,9 @@ public class DialogueDisplayer : MonoBehaviour {
                     clonedChoice.GetComponent<BubbleText>().PlayNow();
                     previousChoicePos = clonedChoice.transform.position;
                 }
+
+                //Next, we should adapt the bubble to the new text format
+                //TODO bubbleBackImage.rectTransform. =
 
                 iterator++;
             }
