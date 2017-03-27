@@ -183,18 +183,26 @@ public class DialogueDisplayer : MonoBehaviour {
                 if (iterator == 0)
                 {
                     textToDisplay = choice;
-                    wordSizeFitter.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
-                    wordSizeFitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+                    //wordSizeFitter.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
+                    textComponent.horizontalOverflow = HorizontalWrapMode.Overflow;
+                    wordSizeFitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize; //Text is now displayed correctly
+
+                    //Now let's align the text rect with the upper side of the bubble rect
+                    textComponent.transform.position = new Vector3(textComponent.transform.position.x,
+                        (bubbleBackRectTransform.transform.position.y + (bubbleBackRectTransform.rect.size.y / 2) * canvas.scaleFactor) - (textComponent.rectTransform.rect.size.y) * canvas.scaleFactor, //TODO: This should work but there's a way to factorize it huh. Nah not working because I think it might use the text rect size from the previous frame....
+                        textComponent.transform.position.z); 
+
                     previousChoicePos = textComponent.transform.position;
                     textComponent.SetAllDirty();
                     Canvas.ForceUpdateCanvases();
                 }
                 else
                 {
-                    Vector3 targetPos = new Vector3(previousChoicePos.x, previousChoicePos.y - (textComponent.rectTransform.rect.height * 2) * canvas.scaleFactor, previousChoicePos.z); //TODO : Doesn't work, you asshole
-                    //All right so... You should really call all of this on the next frame, because Unity UI doesn't have time to do shit and that's where the bug come from
+                    Vector3 targetPos = new Vector3(previousChoicePos.x , previousChoicePos.y - (textComponent.rectTransform.rect.size.y) * canvas.scaleFactor, previousChoicePos.z);
+
                     GameObject clonedChoice = GameObject.Instantiate(textComponent.gameObject);
                     clonedChoice.transform.SetParent(bubbleBackImage.transform);
+                    clonedChoice.transform.localScale = Vector3.one;
                     clonedChoice.transform.position = targetPos;
                     clonedChoice.GetComponent<Text>().text = choice;
                     clonedChoice.GetComponent<BubbleText>().PlayNow();
